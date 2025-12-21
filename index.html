@@ -171,10 +171,6 @@
             transition: transform 0.3s ease;
         }
 
-        .mobile-menu-btn.rotate {
-            transform: rotate(90deg);
-        }
-
         .mobile-nav {
             display: none;
             background-color: var(--bg-secondary);
@@ -347,55 +343,168 @@
             box-shadow: 0 4px 12px rgba(31, 111, 235, 0.2);
         }
 
-        .cta-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-            margin: 2rem 0 1rem 0;
-        }
-
-        .btn {
-            padding: 0.8rem 1.5rem;
+        .create-nation-btn {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
             border-radius: var(--radius);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-            font-size: 0.9rem;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 1rem auto;
+            display: block;
+            transition: all 0.3s;
+            font-family: 'Minecraft', monospace;
             font-weight: bold;
-            min-height: 44px;
-            touch-action: manipulation;
         }
 
-        .btn-discord {
-            background-color: var(--discord-color);
-            color: white;
-            border-color: var(--discord-color);
-        }
-
-        .btn-discord:hover, .btn-discord:active {
-            background-color: #4752c4;
-            border-color: #4752c4;
+        .create-nation-btn:hover {
+            background-color: #0d5fd8;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(88, 101, 242, 0.3);
+            box-shadow: 0 6px 12px rgba(31, 111, 235, 0.3);
         }
 
-        .btn-telegram {
+        .nation-form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            display: none;
+        }
+
+        .nation-form {
             background-color: var(--bg-card);
-            color: var(--text-primary);
-            border-color: var(--border-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            position: relative;
         }
 
-        .btn-telegram:hover, .btn-telegram:active {
-            background-color: var(--telegram-color);
-            border-color: var(--telegram-color);
+        .form-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-label .optional {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Minecraft', monospace;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .form-file {
+            display: none;
+        }
+
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .file-btn {
+            background-color: var(--accent-blue);
             color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: 'Minecraft', monospace;
+        }
+
+        .file-name {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .submit-btn {
+            flex: 1;
+            background-color: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: 'Minecraft', monospace;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #1a6d28;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 136, 204, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cancel-btn {
+            flex: 1;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: 'Minecraft', monospace;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-secondary);
+            transform: translateY(-2px);
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            color: var(--accent-green);
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: rgba(35, 134, 54, 0.1);
+            border-radius: var(--radius);
+            border: 1px solid var(--accent-green);
         }
 
         .section-title {
@@ -533,10 +642,11 @@
             margin-bottom: 6px;
         }
 
-        .rule-icon {
+        .rule-number {
             color: var(--accent-blue);
-            font-size: 1rem;
-            min-width: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            min-width: 30px;
         }
 
         .rule-title {
@@ -546,7 +656,7 @@
 
         .rule-text {
             color: var(--text-secondary);
-            padding-left: 28px;
+            padding-left: 38px;
             font-size: 0.9rem;
             line-height: 1.4;
         }
@@ -565,9 +675,8 @@
 
         .footer-content {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            flex-wrap: wrap;
             gap: 1rem;
         }
 
@@ -601,15 +710,46 @@
             touch-action: manipulation;
         }
 
-        .footer-link:hover, .footer-link:active {
-            color: var(--telegram-color);
+        .footer-link.telegram {
+            background-color: transparent;
+            background-image: url('https://raw.githubusercontent.com/NationShield/-/refs/heads/main/img/te.png');
+            background-size: 60%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .footer-link.telegram i {
+            display: none;
+        }
+
+        .footer-link.telegram:hover, .footer-link.telegram:active {
             background-color: rgba(0, 136, 204, 0.1);
-            transform: translateY(-2px);
+        }
+
+        .footer-link.discord {
+            background-color: transparent;
+            background-image: url('https://raw.githubusercontent.com/NationShield/-/refs/heads/main/img/di.png');
+            background-size: 60%;
+            background-position: center;
+            background-repeat: no-repeat;
+            cursor: default;
+        }
+
+        .footer-link.discord i {
+            display: none;
         }
 
         .footer-link.discord:hover, .footer-link.discord:active {
-            color: var(--discord-color);
-            background-color: rgba(88, 101, 242, 0.1);
+            background-color: transparent;
+            transform: none;
+        }
+
+        .website-version {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 0.5rem;
+            opacity: 0.7;
         }
 
         @media (max-width: 1024px) {
@@ -639,16 +779,6 @@
                 font-size: 1.8rem;
             }
             
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 280px;
-            }
-            
             .cards-grid {
                 grid-template-columns: 1fr;
             }
@@ -665,6 +795,14 @@
             
             .mobile-nav {
                 display: block;
+            }
+            
+            .nation-form {
+                padding: 1.5rem;
+            }
+            
+            .form-buttons {
+                flex-direction: column;
             }
         }
 
@@ -690,11 +828,6 @@
                 padding: 0.8rem;
             }
             
-            .btn {
-                padding: 0.7rem 1.2rem;
-                font-size: 0.85rem;
-            }
-            
             .mobile-nav-btn {
                 font-size: 0.7rem;
                 min-width: 55px;
@@ -702,6 +835,10 @@
             
             .mobile-nav-btn i {
                 font-size: 1rem;
+            }
+            
+            .nation-form {
+                padding: 1rem;
             }
         }
 
@@ -724,10 +861,6 @@
                 transform: translateY(-1px);
             }
             
-            .btn:hover, .btn:active {
-                transform: translateY(-1px);
-            }
-            
             .server-ip:hover, .server-ip:active {
                 transform: translateY(-1px);
             }
@@ -735,10 +868,22 @@
             .info-item:hover, .info-item:active {
                 transform: translateY(-1px);
             }
+            
+            .create-nation-btn:hover {
+                transform: translateY(-1px);
+            }
+            
+            .submit-btn:hover {
+                transform: translateY(-1px);
+            }
+            
+            .cancel-btn:hover {
+                transform: translateY(-1px);
+            }
         }
 
         @supports (-webkit-touch-callout: none) {
-            input, textarea, .server-ip, .btn {
+            input, textarea, .server-ip {
                 font-size: 16px;
             }
         }
@@ -801,18 +946,63 @@
                     
                     <div class="server-ip-container">
                         <span class="server-ip-label">IP-адрес сервера</span>
-                        <div class="server-ip" id="serverIp" onclick="copyIP()">
+                        <div class="server-ip" id="serverIp">
                             NationShield.aternos.me:44833
                         </div>
                     </div>
                     
-                    <div class="cta-buttons">
-                        <a href="https://t.me/NationShieldAternos" target="_blank" class="btn btn-telegram">
-                            <i class="fab fa-telegram"></i> Telegram
-                        </a>
-                        <a href="https://discord.gg/example" target="_blank" class="btn btn-discord">
-                            <i class="fab fa-discord"></i> Discord
-                        </a>
+                    <button class="create-nation-btn" id="createNationBtn">
+                        Создать Государство
+                    </button>
+                    
+                    <div class="nation-form-container" id="nationFormContainer">
+                        <div class="nation-form">
+                            <h3 class="form-title">Создание Государства</h3>
+                            <form id="nationForm">
+                                <div class="form-group">
+                                    <label class="form-label">1. Название:</label>
+                                    <input type="text" class="form-input" id="nationName" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">2. Идеология:</label>
+                                    <input type="text" class="form-input" id="ideology" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">3. Форма правления:</label>
+                                    <input type="text" class="form-input" id="governmentForm" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">4. Религия <span class="optional">(Необязательно)</span>:</label>
+                                    <input type="text" class="form-input" id="religion">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">5. Лидер (Юзернейм Telegram):</label>
+                                    <input type="text" class="form-input" id="leader" placeholder="@username" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">6. Флаг (изображение):</label>
+                                    <div class="file-upload">
+                                        <label for="flagImage" class="file-btn">Выбрать файл</label>
+                                        <span class="file-name" id="fileName">Файл не выбран</span>
+                                        <input type="file" class="form-file" id="flagImage" accept="image/*" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-buttons">
+                                    <button type="submit" class="submit-btn" id="submitBtn">Отправить на модерацию</button>
+                                    <button type="button" class="cancel-btn" id="cancelBtn">Я Передумал</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="success-message" id="successMessage">
+                            Спасибо! Ваша Страна На Модерации
+                        </div>
                     </div>
                 </div>
             </div>
@@ -872,8 +1062,8 @@
                     <div class="info-icon">
                         <i class="fas fa-wifi"></i>
                     </div>
-                    <div class="info-title">Аптайм</div>
-                    <div class="info-value">99.9%</div>
+                    <div class="info-title">Пинг</div>
+                    <div class="info-value">Минимальный</div>
                 </div>
                 
                 <div class="info-item">
@@ -892,34 +1082,50 @@
             <div class="rules-list">
                 <div class="rule-item">
                     <div class="rule-header">
-                        <i class="fas fa-ban rule-icon"></i>
-                        <h3 class="rule-title">Запрещено</h3>
+                        <span class="rule-number">1.1</span>
+                        <h3 class="rule-title">Запрещено НОН РП на сервере во время РП ситуаций</h3>
                     </div>
-                    <p class="rule-text">Использование читов, кликеров, макросов, эксплойтов и любых программ, дающих нечестное преимущество в игре.</p>
+                    <p class="rule-text">Во время ролевых ситуаций на сервере запрещено нарушать ролевую игру (НОН РП).</p>
                 </div>
                 
                 <div class="rule-item">
                     <div class="rule-header">
-                        <i class="fas fa-comment-alt rule-icon"></i>
-                        <h3 class="rule-title">Общение</h3>
+                        <span class="rule-number">1.2</span>
+                        <h3 class="rule-title">Запрещено объявление войны без основательной причины</h3>
                     </div>
-                    <p class="rule-text">Запрещены расизм, оскорбления, флуд, спам, реклама других серверов и токсичное поведение в любых формах.</p>
+                    <p class="rule-text">Объявление войны возможно только при наличии веских причин и обоснования.</p>
                 </div>
                 
                 <div class="rule-item">
                     <div class="rule-header">
-                        <i class="fas fa-fire rule-icon"></i>
-                        <h3 class="rule-title">Гриферство</h3>
+                        <span class="rule-number">1.3</span>
+                        <h3 class="rule-title">Запрещено оскорблять родственников в ГЧ и обычном чате</h3>
                     </div>
-                    <p class="rule-text">Нельзя портить или уничтожать чужие постройки без явного разрешения их владельцев. Уважайте чужой труд.</p>
+                    <p class="rule-text">Запрещены оскорбления родственников в голосовом и текстовом чатах.</p>
                 </div>
                 
                 <div class="rule-item">
                     <div class="rule-header">
-                        <i class="fas fa-bug rule-icon"></i>
-                        <h3 class="rule-title">Баги и эксплойты</h3>
+                        <span class="rule-number">1.4</span>
+                        <h3 class="rule-title">Запрещено объявлять войну когда на сервере нету минимум одного гражданина страны которой объявляется война</h3>
                     </div>
-                    <p class="rule-text">Обязательно сообщайте администрации о найденных багах. Использование игровых ошибок в личных целях карается пермабаном.</p>
+                    <p class="rule-text">Объявление войны возможно только если в стране-цели находится минимум один гражданин.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <span class="rule-number">1.5</span>
+                        <h3 class="rule-title">Запрещены ЛЮБЫЕ моды/ресурспаки которые облегчают игру и дают доминирование в развитии</h3>
+                    </div>
+                    <p class="rule-text">Xray, Killaura, Autototem и другие моды/ресурспаки, дающие нечестное преимущество, запрещены.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <span class="rule-number">1.6</span>
+                        <h3 class="rule-title">На данный момент в государстве может быть максимум 5 игроков!</h3>
+                    </div>
+                    <p class="rule-text">Максимальное количество игроков в одном государстве ограничено 5 персонами.</p>
                 </div>
             </div>
         </section>
@@ -932,13 +1138,14 @@
                     © 2025 Nation Shield Aternos Server.
                 </div>
                 <div class="footer-right">
-                    <a href="https://t.me/NationShieldAternos" target="_blank" class="footer-link">
+                    <a href="https://t.me/NationShieldAternos" target="_blank" class="footer-link telegram">
                         <i class="fab fa-telegram"></i>
                     </a>
-                    <a href="https://discord.gg/example" target="_blank" class="footer-link discord">
+                    <a href="javascript:void(0)" class="footer-link discord">
                         <i class="fab fa-discord"></i>
                     </a>
                 </div>
+                <div class="website-version">V3.6</div>
             </div>
         </div>
     </footer>
@@ -950,6 +1157,15 @@
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const mobileNav = document.getElementById('mobileNav');
             const desktopNav = document.querySelector('.desktop-nav');
+            
+            const createNationBtn = document.getElementById('createNationBtn');
+            const nationFormContainer = document.getElementById('nationFormContainer');
+            const nationForm = document.getElementById('nationForm');
+            const successMessage = document.getElementById('successMessage');
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const flagImage = document.getElementById('flagImage');
+            const fileName = document.getElementById('fileName');
             
             const font = new FontFace('Minecraft', 'url(https://raw.githubusercontent.com/NationShield/-/main/source/Minecraft.ttf)');
             
@@ -983,16 +1199,26 @@
                 mobileNav.style.display = 'none';
             }
             
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768) {
+                    mobileMenuBtn.style.display = 'block';
+                    desktopNav.style.display = 'none';
+                    mobileNav.style.display = 'block';
+                } else {
+                    mobileMenuBtn.style.display = 'none';
+                    desktopNav.style.display = 'flex';
+                    mobileNav.style.display = 'none';
+                }
+            });
+            
             let isMenuOpen = false;
             
             mobileMenuBtn.addEventListener('click', function() {
                 isMenuOpen = !isMenuOpen;
                 
                 if (isMenuOpen) {
-                    mobileMenuBtn.classList.add('rotate');
                     mobileNav.classList.add('active');
                 } else {
-                    mobileMenuBtn.classList.remove('rotate');
                     mobileNav.classList.remove('active');
                 }
             });
@@ -1001,78 +1227,183 @@
                 btn.addEventListener('click', function() {
                     const tabId = this.getAttribute('data-tab');
                     switchTab(tabId);
-                    
-                    isMenuOpen = false;
-                    mobileMenuBtn.classList.remove('rotate');
-                    mobileNav.classList.remove('active');
                 });
             });
             
-            window.addEventListener('resize', function() {
-                if (window.innerWidth <= 768) {
-                    mobileMenuBtn.style.display = 'block';
-                    desktopNav.style.display = 'none';
-                    mobileNav.style.display = 'block';
-                    
-                    if (isMenuOpen) {
-                        mobileNav.classList.add('active');
-                    }
+            createNationBtn.addEventListener('click', function() {
+                nationFormContainer.style.display = 'block';
+                createNationBtn.style.display = 'none';
+                nationFormContainer.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            cancelBtn.addEventListener('click', function() {
+                nationFormContainer.style.display = 'none';
+                createNationBtn.style.display = 'block';
+                nationForm.reset();
+                fileName.textContent = 'Файл не выбран';
+            });
+            
+            flagImage.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
                 } else {
-                    mobileMenuBtn.style.display = 'none';
-                    desktopNav.style.display = 'flex';
-                    mobileNav.style.display = 'none';
-                    isMenuOpen = false;
-                    mobileMenuBtn.classList.remove('rotate');
+                    fileName.textContent = 'Файл не выбран';
                 }
             });
             
-            document.addEventListener('click', function(event) {
-                if (isMenuOpen && 
-                    !mobileNav.contains(event.target) && 
-                    !mobileMenuBtn.contains(event.target) &&
-                    window.innerWidth <= 768) {
-                    isMenuOpen = false;
-                    mobileMenuBtn.classList.remove('rotate');
-                    mobileNav.classList.remove('active');
+            nationForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const nationName = document.getElementById('nationName').value.trim();
+                const ideology = document.getElementById('ideology').value.trim();
+                const governmentForm = document.getElementById('governmentForm').value.trim();
+                const religion = document.getElementById('religion').value.trim();
+                const leader = document.getElementById('leader').value.trim();
+                const flagFile = flagImage.files[0];
+                
+                if (!nationName || !ideology || !governmentForm || !leader || !flagFile) {
+                    alert('Пожалуйста, заполните все обязательные поля!');
+                    return;
+                }
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Отправка...';
+                
+                const botToken = '7471360964:AAGbg0B8XfbuZUPdFWIcIidwbTjEqLvE70Y';
+                const chatId = '@NationShieldGroup';
+                
+                const message = `🏛️ *Название:* ${nationName}
+📜 *Идеология:* ${ideology}
+👑 *Форма правления:* ${governmentForm}
+🙏 *Религия:* ${religion || 'Не указана'}
+👤 *Лидер:* ${leader}`;
+                
+                try {
+                    if (flagFile.size > 20 * 1024 * 1024) {
+                        throw new Error('Файл слишком большой! Максимальный размер: 20MB');
+                    }
+                    
+                    const photoFormData = new FormData();
+                    photoFormData.append('chat_id', chatId);
+                    photoFormData.append('photo', flagFile);
+                    photoFormData.append('caption', message);
+                    photoFormData.append('parse_mode', 'Markdown');
+                    
+                    const photoResponse = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                        method: 'POST',
+                        body: photoFormData
+                    });
+                    
+                    const photoResult = await photoResponse.json();
+                    
+                    if (!photoResponse.ok) {
+                        throw new Error('Не удалось отправить изображение');
+                    }
+                    
+                    nationForm.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                        nationForm.style.display = 'block';
+                        nationForm.reset();
+                        fileName.textContent = 'Файл не выбран';
+                        createNationBtn.style.display = 'block';
+                        nationFormContainer.style.display = 'none';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Отправить на модерацию';
+                    }, 5000);
+                    
+                } catch (error) {
+                    console.error('Ошибка отправки:', error);
+                    
+                    try {
+                        const textFormData = new FormData();
+                        textFormData.append('chat_id', chatId);
+                        textFormData.append('text', message + '\n\n⚠️ *Примечание:* Не удалось отправить изображение флага');
+                        textFormData.append('parse_mode', 'Markdown');
+                        
+                        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                            method: 'POST',
+                            body: textFormData
+                        });
+                        
+                        nationForm.style.display = 'none';
+                        successMessage.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            successMessage.style.display = 'none';
+                            nationForm.style.display = 'block';
+                            nationForm.reset();
+                            fileName.textContent = 'Файл не выбран';
+                            createNationBtn.style.display = 'block';
+                            nationFormContainer.style.display = 'none';
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Отправить на модерацию';
+                        }, 5000);
+                        
+                    } catch (textError) {
+                        console.error('Ошибка отправки текста:', textError);
+                        alert('Произошла ошибка при отправке заявки. Пожалуйста, попробуйте снова.');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Отправить на модерацию';
+                    }
                 }
             });
-        });
-        
-        function copyIP() {
-            const ip = 'NationShield.aternos.me:44833';
-            navigator.clipboard.writeText(ip).then(() => {
-                const serverIp = document.getElementById('serverIp');
-                const originalText = serverIp.textContent;
-                serverIp.textContent = 'Скопировано!';
-                serverIp.style.color = 'var(--accent-green)';
-                serverIp.style.borderColor = 'var(--accent-green)';
+            
+            let copyTimeout = null;
+            let isCopying = false;
+            const serverIp = document.getElementById('serverIp');
+            const originalText = serverIp.textContent;
+            
+            serverIp.addEventListener('click', function() {
+                if (isCopying) return;
                 
-                setTimeout(() => {
-                    serverIp.textContent = originalText;
-                    serverIp.style.color = '';
-                    serverIp.style.borderColor = '';
-                }, 2000);
-            }).catch(err => {
-                const textArea = document.createElement('textarea');
-                textArea.value = ip;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
+                isCopying = true;
+                const ip = 'NationShield.aternos.me:44833';
                 
-                const serverIp = document.getElementById('serverIp');
-                const originalText = serverIp.textContent;
-                serverIp.textContent = 'Скопировано!';
-                serverIp.style.color = 'var(--accent-green)';
-                serverIp.style.borderColor = 'var(--accent-green)';
+                if (copyTimeout) {
+                    clearTimeout(copyTimeout);
+                }
                 
-                setTimeout(() => {
-                    serverIp.textContent = originalText;
-                    serverIp.style.color = '';
-                    serverIp.style.borderColor = '';
-                }, 2000);
+                navigator.clipboard.writeText(ip).then(() => {
+                    serverIp.textContent = 'Скопировано!';
+                    serverIp.style.color = 'var(--accent-green)';
+                    serverIp.style.borderColor = 'var(--accent-green)';
+                    
+                    copyTimeout = setTimeout(() => {
+                        serverIp.textContent = originalText;
+                        serverIp.style.color = '';
+                        serverIp.style.borderColor = '';
+                        isCopying = false;
+                    }, 1500);
+                }).catch(err => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = ip;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    serverIp.textContent = 'Скопировано!';
+                    serverIp.style.color = 'var(--accent-green)';
+                    serverIp.style.borderColor = 'var(--accent-green)';
+                    
+                    copyTimeout = setTimeout(() => {
+                        serverIp.textContent = originalText;
+                        serverIp.style.color = '';
+                        serverIp.style.borderColor = '';
+                        isCopying = false;
+                    }, 1500);
+                });
             });
-        }
+            
+            // Запрещаем действие по клику на Discord
+            document.querySelector('.footer-link.discord').addEventListener('click', function(e) {
+                e.preventDefault();
+                // Ничего не происходит
+            });
+        });
         
         function switchTab(tabId) {
             const footer = document.getElementById('mainFooter');
