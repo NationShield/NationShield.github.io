@@ -60,6 +60,7 @@
             --text-secondary: #8b949e;
             --accent-blue: #1f6feb;
             --accent-green: #238636;
+            --accent-red: #da3633;
             --telegram-color: #0088cc;
             --discord-color: #5865F2;
             --shadow: rgba(0, 0, 0, 0.4);
@@ -358,10 +359,31 @@
             font-weight: bold;
         }
 
-        .create-nation-btn:hover {
+        .create-nation-btn:hover:not(:disabled) {
             background-color: #0d5fd8;
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(31, 111, 235, 0.3);
+        }
+
+        .create-nation-btn:disabled {
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .cooldown-message {
+            display: none;
+            text-align: center;
+            color: var(--accent-red);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(218, 54, 51, 0.1);
+            border-radius: var(--radius);
+            border: 1px solid var(--accent-red);
         }
 
         .nation-form-container {
@@ -869,7 +891,7 @@
                 transform: translateY(-1px);
             }
             
-            .create-nation-btn:hover {
+            .create-nation-btn:hover:not(:disabled) {
                 transform: translateY(-1px);
             }
             
@@ -954,6 +976,7 @@
                     <button class="create-nation-btn" id="createNationBtn">
                         Создать Государство
                     </button>
+                    <div class="cooldown-message" id="cooldownMessage"></div>
                     
                     <div class="nation-form-container" id="nationFormContainer">
                         <div class="nation-form">
@@ -1033,7 +1056,7 @@
                         <i class="fas fa-microphone"></i>
                     </div>
                     <h3 class="card-title">Голосовой чат</h3>
-                    <p class="card-text">Интеграция с Simple Voice Chat для тактического общения в бою. Настройка радиуса слышимости и групповых каналов для координации.</p>
+                    <p class="card-text">Simple Voice Chat поддерживается на нашем сервере</p>
                 </div>
             </div>
         </section>
@@ -1145,7 +1168,7 @@
                         <i class="fab fa-discord"></i>
                     </a>
                 </div>
-                <div class="website-version">V3.6</div>
+                <div class="website-version">V4.0</div>
             </div>
         </div>
     </footer>
@@ -1166,6 +1189,77 @@
             const cancelBtn = document.getElementById('cancelBtn');
             const flagImage = document.getElementById('flagImage');
             const fileName = document.getElementById('fileName');
+            const leaderInput = document.getElementById('leader');
+            const cooldownMessage = document.getElementById('cooldownMessage');
+            
+            const COOLDOWN_TIME = 60000;
+            const STORAGE_KEY = 'nation_shield_cooldown';
+            
+            function getUserIP() {
+                return new Promise((resolve) => {
+                    fetch('https://api.ipify.org?format=json')
+                        .then(response => response.json())
+                        .then(data => resolve(data.ip))
+                        .catch(() => {
+                            fetch('https://api64.ipify.org?format=json')
+                                .then(response => response.json())
+                                .then(data => resolve(data.ip))
+                                .catch(() => resolve('unknown'));
+                        });
+                });
+            }
+            
+            function checkCooldown() {
+                const cooldownData = localStorage.getItem(STORAGE_KEY);
+                if (!cooldownData) return null;
+                
+                const { ip, timestamp } = JSON.parse(cooldownData);
+                const now = Date.now();
+                const timeLeft = COOLDOWN_TIME - (now - timestamp);
+                
+                if (timeLeft > 0) {
+                    return { ip, timeLeft };
+                } else {
+                    localStorage.removeItem(STORAGE_KEY);
+                    return null;
+                }
+            }
+            
+            function setCooldown(ip) {
+                const cooldownData = {
+                    ip: ip,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(cooldownData));
+            }
+            
+            async function updateCooldownButton() {
+                const cooldown = checkCooldown();
+                
+                if (cooldown) {
+                    createNationBtn.disabled = true;
+                    cooldownMessage.style.display = 'block';
+                    
+                    const updateMessage = () => {
+                        const timeLeft = Math.ceil(cooldown.timeLeft / 1000);
+                        cooldownMessage.textContent = `Подождите ${timeLeft} секунд перед созданием нового государства`;
+                        
+                        if (timeLeft > 0) {
+                            cooldown.timeLeft -= 1000;
+                            setTimeout(updateMessage, 1000);
+                        } else {
+                            createNationBtn.disabled = false;
+                            cooldownMessage.style.display = 'none';
+                            localStorage.removeItem(STORAGE_KEY);
+                        }
+                    };
+                    
+                    updateMessage();
+                } else {
+                    createNationBtn.disabled = false;
+                    cooldownMessage.style.display = 'none';
+                }
+            }
             
             const font = new FontFace('Minecraft', 'url(https://raw.githubusercontent.com/NationShield/-/main/source/Minecraft.ttf)');
             
@@ -1188,6 +1282,8 @@
                     body.classList.add('loaded');
                 }, 500);
             });
+            
+            updateCooldownButton();
             
             if (window.innerWidth <= 768) {
                 mobileMenuBtn.style.display = 'block';
@@ -1231,6 +1327,12 @@
             });
             
             createNationBtn.addEventListener('click', function() {
+                const cooldown = checkCooldown();
+                if (cooldown) {
+                    alert(`Подождите ${Math.ceil(cooldown.timeLeft / 1000)} секунд перед созданием нового государства`);
+                    return;
+                }
+                
                 nationFormContainer.style.display = 'block';
                 createNationBtn.style.display = 'none';
                 nationFormContainer.scrollIntoView({ behavior: 'smooth' });
@@ -1251,6 +1353,36 @@
                 }
             });
             
+            function validateTelegramUsername(username) {
+                const telegramPattern = /^@[a-zA-Z0-9_]{5,32}$/;
+                return telegramPattern.test(username);
+            }
+            
+            leaderInput.addEventListener('input', function(e) {
+                let value = this.value;
+                
+                if (value.length > 0 && !value.startsWith('@')) {
+                    value = '@' + value.replace(/^@+/, '');
+                    this.value = value;
+                }
+                
+                value = value.replace(/[^a-zA-Z0-9_@]/g, '');
+                
+                if (value.length > 1 && !value.startsWith('@')) {
+                    value = '@' + value.slice(1);
+                }
+                
+                this.value = value;
+            });
+            
+            leaderInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                if (value && !validateTelegramUsername(value)) {
+                    alert('Пожалуйста, введите корректный юзернейм Telegram (начинается с @, содержит только английские буквы, цифры и подчеркивания)');
+                    this.focus();
+                }
+            });
+            
             nationForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
@@ -1263,6 +1395,18 @@
                 
                 if (!nationName || !ideology || !governmentForm || !leader || !flagFile) {
                     alert('Пожалуйста, заполните все обязательные поля!');
+                    return;
+                }
+                
+                if (!validateTelegramUsername(leader)) {
+                    alert('Пожалуйста, введите корректный юзернейм Telegram (начинается с @, содержит только английские буквы, цифры и подчеркивания)');
+                    leaderInput.focus();
+                    return;
+                }
+                
+                const cooldown = checkCooldown();
+                if (cooldown) {
+                    alert(`Подождите ${Math.ceil(cooldown.timeLeft / 1000)} секунд перед созданием нового государства`);
                     return;
                 }
                 
@@ -1279,6 +1423,8 @@
 👤 *Лидер:* ${leader}`;
                 
                 try {
+                    const userIP = await getUserIP();
+                    
                     if (flagFile.size > 20 * 1024 * 1024) {
                         throw new Error('Файл слишком большой! Максимальный размер: 20MB');
                     }
@@ -1300,6 +1446,8 @@
                         throw new Error('Не удалось отправить изображение');
                     }
                     
+                    setCooldown(userIP);
+                    
                     nationForm.style.display = 'none';
                     successMessage.style.display = 'block';
                     
@@ -1312,12 +1460,15 @@
                         nationFormContainer.style.display = 'none';
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'Отправить на модерацию';
+                        
+                        updateCooldownButton();
                     }, 5000);
                     
                 } catch (error) {
                     console.error('Ошибка отправки:', error);
                     
                     try {
+                        const userIP = await getUserIP();
                         const textFormData = new FormData();
                         textFormData.append('chat_id', chatId);
                         textFormData.append('text', message + '\n\n⚠️ *Примечание:* Не удалось отправить изображение флага');
@@ -1327,6 +1478,8 @@
                             method: 'POST',
                             body: textFormData
                         });
+                        
+                        setCooldown(userIP);
                         
                         nationForm.style.display = 'none';
                         successMessage.style.display = 'block';
@@ -1340,6 +1493,8 @@
                             nationFormContainer.style.display = 'none';
                             submitBtn.disabled = false;
                             submitBtn.textContent = 'Отправить на модерацию';
+                            
+                            updateCooldownButton();
                         }, 5000);
                         
                     } catch (textError) {
@@ -1398,11 +1553,11 @@
                 });
             });
             
-            // Запрещаем действие по клику на Discord
             document.querySelector('.footer-link.discord').addEventListener('click', function(e) {
                 e.preventDefault();
-                // Ничего не происходит
             });
+            
+            setInterval(updateCooldownButton, 1000);
         });
         
         function switchTab(tabId) {
