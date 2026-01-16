@@ -1,1 +1,1605 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nation Shield — Minecraft Server</title>
+    <link rel="icon" type="image/jpg" href="https://raw.githubusercontent.com/NationShield/-/refs/heads/main/img/server.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #preloader {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .preloader-content {
+            text-align: center;
+        }
+        
+        .preloader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        .preloader-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('https://raw.githubusercontent.com/NationShield/-/main/source/Minecraft.ttf') format('truetype');
+            font-display: swap;
+        }
+
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #21262d;
+            --border-color: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --accent-blue: #1f6feb;
+            --accent-green: #238636;
+            --accent-red: #da3633;
+            --telegram-color: #0088cc;
+            --discord-color: #5865F2;
+            --shadow: rgba(0, 0, 0, 0.4);
+            --radius: 6px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Minecraft', monospace;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.8rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            background-image: url('https://raw.githubusercontent.com/NationShield/-/refs/heads/main/img/server.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius);
+            border: 2px solid var(--accent-blue);
+        }
+
+        .desktop-nav {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .nav-tab {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            font-family: 'Minecraft', monospace;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover, .nav-tab.active {
+            color: var(--accent-blue);
+            background-color: rgba(31, 111, 235, 0.1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-nav {
+            display: none;
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            backdrop-filter: blur(10px);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-nav.active {
+            transform: translateY(0);
+        }
+
+        .mobile-nav-buttons {
+            display: flex;
+            justify-content: space-around;
+            padding: 0 10px;
+        }
+
+        .mobile-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px;
+            border-radius: var(--radius);
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            font-size: 0.8rem;
+            min-width: 60px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-nav.active .mobile-nav-btn {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .mobile-nav-btn:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-nav-btn:nth-child(2) { transition-delay: 0.2s; }
+        .mobile-nav-btn:nth-child(3) { transition-delay: 0.3s; }
+        .mobile-nav-btn:nth-child(4) { transition-delay: 0.4s; }
+
+        .mobile-nav-btn i {
+            font-size: 1.2rem;
+        }
+
+        .mobile-nav-btn.active {
+            color: var(--accent-blue);
+            background-color: rgba(31, 111, 235, 0.1);
+        }
+
+        .content-section {
+            display: none;
+            padding: 1.5rem 0;
+            animation: fadeIn 0.5s;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            text-align: center;
+            padding: 2.5rem 0;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(rgba(13, 17, 23, 0.8), rgba(13, 17, 23, 0.9)), url('https://raw.githubusercontent.com/NationShield/-/refs/heads/main/img/me.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius);
+            position: relative;
+            overflow: hidden;
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                background-attachment: scroll;
+                min-height: 50vh;
+                padding: 2rem 0;
+            }
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(31, 111, 235, 0.1) 0%, transparent 50%, rgba(35, 134, 54, 0.1) 100%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            padding: 0 15px;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            word-break: break-word;
+        }
+
+        .hero-title span {
+            color: var(--accent-blue);
+        }
+
+        .server-ip-container {
+            margin: 2rem auto 1.5rem auto;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .server-ip-label {
+            display: block;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .server-ip {
+            background-color: rgba(33, 38, 45, 0.95);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-size: 1.2rem;
+            text-align: center;
+            display: block;
+            width: 100%;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+            letter-spacing: 0.5px;
+            font-weight: bold;
+            word-break: break-all;
+            touch-action: manipulation;
+        }
+
+        .server-ip:hover, .server-ip:active {
+            border-color: var(--accent-blue);
+            background-color: rgba(31, 111, 235, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(31, 111, 235, 0.2);
+        }
+
+        .create-nation-btn {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 1rem auto;
+            display: block;
+            transition: all 0.3s;
+            font-family: 'Minecraft', monospace;
+            font-weight: bold;
+        }
+
+        .create-nation-btn:hover:not(:disabled) {
+            background-color: #0d5fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(31, 111, 235, 0.3);
+        }
+
+        .create-nation-btn:disabled {
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .cooldown-message {
+            display: none;
+            text-align: center;
+            color: var(--accent-red);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(218, 54, 51, 0.1);
+            border-radius: var(--radius);
+            border: 1px solid var(--accent-red);
+        }
+
+        .nation-form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            display: none;
+        }
+
+        .nation-form {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-label .optional {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Minecraft', monospace;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .form-file {
+            display: none;
+        }
+
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .file-btn {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-family: 'Minecraft', monospace;
+        }
+
+        .file-name {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .submit-btn {
+            flex: 1;
+            background-color: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: 'Minecraft', monospace;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #1a6d28;
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cancel-btn {
+            flex: 1;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: 'Minecraft', monospace;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-secondary);
+            transform: translateY(-2px);
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            color: var(--accent-green);
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: rgba(35, 134, 54, 0.1);
+            border-radius: var(--radius);
+            border: 1px solid var(--accent-green);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 0 5px;
+        }
+
+        @media (max-width: 480px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .card:hover, .card:active {
+            border-color: var(--accent-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px var(--shadow);
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            color: var(--accent-blue);
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 0 5px;
+        }
+
+        @media (max-width: 480px) {
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+            }
+        }
+
+        .info-item {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .info-item:hover, .info-item:active {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .info-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.6rem;
+            color: var(--accent-blue);
+        }
+
+        .info-title {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+
+        .rules-list {
+            max-width: 800px;
+            margin: 0 auto;
+            margin-top: 1.5rem;
+            padding: 0 10px;
+        }
+
+        .rule-item {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .rule-item:hover, .rule-item:active {
+            border-color: var(--accent-blue);
+            background-color: rgba(31, 111, 235, 0.05);
+        }
+
+        .rule-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .rule-number {
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+            font-weight: bold;
+            min-width: 30px;
+        }
+
+        .rule-title {
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .rule-text {
+            color: var(--text-secondary);
+            padding-left: 38px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .footer {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .footer.active {
+            display: block;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .footer-left {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.05);
+            touch-action: manipulation;
+        }
+
+        .footer-link.telegram {
+            background-color: transparent;
+            background-image: url('https://raw.githubusercontent.com/NationShield/-/refs/heads/main/img/te.png');
+            background-size: 60%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .footer-link.telegram i {
+            display: none;
+        }
+
+        .footer-link.telegram:hover, .footer-link.telegram:active {
+            background-color: rgba(0, 136, 204, 0.1);
+        }
+
+        .footer-link.discord {
+            background-color: transparent;
+            background-image: url('https://raw.githubusercontent.com/NationShield/-/refs/heads/main/img/di.png');
+            background-size: 60%;
+            background-position: center;
+            background-repeat: no-repeat;
+            cursor: default;
+        }
+
+        .footer-link.discord i {
+            display: none;
+        }
+
+        .footer-link.discord:hover, .footer-link.discord:active {
+            background-color: transparent;
+            transform: none;
+        }
+
+        .website-version {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 1024px) {
+            html {
+                font-size: 15px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .desktop-nav {
+                display: none;
+            }
+            
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .server-ip {
+                padding: 0.9rem;
+                font-size: 1.1rem;
+            }
+            
+            .mobile-nav {
+                display: block;
+            }
+            
+            .nation-form {
+                padding: 1.5rem;
+            }
+            
+            .form-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            html {
+                font-size: 13px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .hero-title {
+                font-size: 1.6rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .server-ip {
+                font-size: 1rem;
+                padding: 0.8rem;
+            }
+            
+            .mobile-nav-btn {
+                font-size: 0.7rem;
+                min-width: 55px;
+            }
+            
+            .mobile-nav-btn i {
+                font-size: 1rem;
+            }
+            
+            .nation-form {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .hero-title {
+                font-size: 1.4rem;
+            }
+            
+            .server-ip {
+                font-size: 0.9rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .card:hover, .card:active {
+                transform: translateY(-1px);
+            }
+            
+            .server-ip:hover, .server-ip:active {
+                transform: translateY(-1px);
+            }
+            
+            .info-item:hover, .info-item:active {
+                transform: translateY(-1px);
+            }
+            
+            .create-nation-btn:hover:not(:disabled) {
+                transform: translateY(-1px);
+            }
+            
+            .submit-btn:hover {
+                transform: translateY(-1px);
+            }
+            
+            .cancel-btn:hover {
+                transform: translateY(-1px);
+            }
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            input, textarea, .server-ip {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="preloader-spinner"></div>
+            <div class="preloader-text">Загрузка...</div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container header-content">
+            <a href="#" class="logo" id="homeTab">
+                <div class="logo-icon"></div>
+                <span>Nation Shield</span>
+            </a>
+            
+            <nav class="desktop-nav">
+                <button class="nav-tab active" data-tab="home">Главная</button>
+                <button class="nav-tab" data-tab="features">Особенности</button>
+                <button class="nav-tab" data-tab="info">Информация</button>
+                <button class="nav-tab" data-tab="rules">Правила</button>
+            </nav>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="container mobile-nav-buttons">
+            <button class="mobile-nav-btn active" data-tab="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="mobile-nav-btn" data-tab="features">
+                <i class="fas fa-star"></i>
+                <span>Особенности</span>
+            </button>
+            <button class="mobile-nav-btn" data-tab="info">
+                <i class="fas fa-info-circle"></i>
+                <span>Информация</span>
+            </button>
+            <button class="mobile-nav-btn" data-tab="rules">
+                <i class="fas fa-book"></i>
+                <span>Правила</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="main container">
+        <section id="home" class="content-section active">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">Nation <span>Shield</span></h1>
+                    
+                    <div class="server-ip-container">
+                        <span class="server-ip-label">IP-адрес сервера</span>
+                        <div class="server-ip" id="serverIp">
+                            NationShield.aternos.me:44833
+                        </div>
+                    </div>
+                    
+                    <button class="create-nation-btn" id="createNationBtn">
+                        Создать Государство
+                    </button>
+                    <div class="cooldown-message" id="cooldownMessage"></div>
+                    
+                    <div class="nation-form-container" id="nationFormContainer">
+                        <div class="nation-form">
+                            <h3 class="form-title">Создание Государства</h3>
+                            <form id="nationForm">
+                                <div class="form-group">
+                                    <label class="form-label">1. Название:</label>
+                                    <input type="text" class="form-input" id="nationName" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">2. Идеология:</label>
+                                    <input type="text" class="form-input" id="ideology" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">3. Форма правления:</label>
+                                    <input type="text" class="form-input" id="governmentForm" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">4. Религия <span class="optional">(Необязательно)</span>:</label>
+                                    <input type="text" class="form-input" id="religion">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">5. Лидер (Юзернейм Telegram):</label>
+                                    <input type="text" class="form-input" id="leader" placeholder="@username" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">6. Флаг (изображение):</label>
+                                    <div class="file-upload">
+                                        <label for="flagImage" class="file-btn">Выбрать файл</label>
+                                        <span class="file-name" id="fileName">Файл не выбран</span>
+                                        <input type="file" class="form-file" id="flagImage" accept="image/*" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-buttons">
+                                    <button type="submit" class="submit-btn" id="submitBtn">Отправить на модерацию</button>
+                                    <button type="button" class="cancel-btn" id="cancelBtn">Я Передумал</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="success-message" id="successMessage">
+                            Спасибо! Ваша Страна На Модерации
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="content-section">
+            <h2 class="section-title">Особенности сервера</h2>
+            
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                    <h3 class="card-title">Система наций</h3>
+                    <p class="card-text">Создавайте собственные государства, захватывайте территории, развивайте экономику и политику. Уникальная дипломатическая система с союзами и войнами.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="card-title">Войны</h3>
+                    <p class="card-text">Страны могут воевать между собой и кто победит неизвестно. Динамичные битвы и стратегические сражения.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <h3 class="card-title">Голосовой чат</h3>
+                    <p class="card-text">Simple Voice Chat поддерживается на нашем сервере</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="info" class="content-section">
+            <h2 class="section-title">Информация о сервера</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="info-title">Версия</div>
+                    <div class="info-value">1.21</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="info-title">Моды</div>
+                    <div class="info-value">Simple Voice Chat</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <div class="info-title">Пинг</div>
+                    <div class="info-value">Минимальный</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="info-title">Игроки</div>
+                    <div class="info-value">200</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="rules" class="content-section">
+            <h2 class="section-title">Правила сервера</h2>
+            
+            <div class="rules-list">
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <span class="rule-number">1.1</span>
+                        <h3 class="rule-title">Запрещено НОН РП на сервере во время РП ситуаций</h3>
+                    </div>
+                    <p class="rule-text">Во время ролевых ситуаций на сервере запрещено нарушать ролевую игру (НОН РП).</p>
+                </div>
+                
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <span class="rule-number">1.2</span>
+                        <h3 class="rule-title">Запрещено объявление войны без основательной причины</h3>
+                    </div>
+                    <p class="rule-text">Объявление войны возможно только при наличии веских причин и обоснования.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <span class="rule-number">1.3</span>
+                        <h3 class="rule-title">Запрещено оскорблять родственников в ГЧ и обычном чате</h3>
+                    </div>
+                    <p class="rule-text">Запрещены оскорбления родственников в голосовом и текстовом чатах.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <span class="rule-number">1.4</span>
+                        <h3 class="rule-title">Запрещено объявлять войну когда на сервере нету минимум одного гражданина страны которой объявляется война</h3>
+                    </div>
+                    <p class="rule-text">Объявление войны возможно только если в стране-цели находится минимум один гражданин.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <span class="rule-number">1.5</span>
+                        <h3 class="rule-title">Запрещены ЛЮБЫЕ моды/ресурспаки которые облегчают игру и дают доминирование в развитии</h3>
+                    </div>
+                    <p class="rule-text">Xray, Killaura, Autototem и другие моды/ресурспаки, дающие нечестное преимущество, запрещены.</p>
+                </div>
+                
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <span class="rule-number">1.6</span>
+                        <h3 class="rule-title">На данный момент в государстве может быть максимум 5 игроков!</h3>
+                    </div>
+                    <p class="rule-text">Максимальное количество игроков в одном государстве ограничено 5 персонами.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer active" id="mainFooter">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    © 2025 Nation Shield Aternos Server.
+                </div>
+                <div class="footer-right">
+                    <a href="https://t.me/NationShieldAternos" target="_blank" class="footer-link telegram">
+                        <i class="fab fa-telegram"></i>
+                    </a>
+                    <a href="javascript:void(0)" class="footer-link discord">
+                        <i class="fab fa-discord"></i>
+                    </a>
+                </div>
+                <div class="website-version">V4.0</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const preloader = document.getElementById('preloader');
+            const body = document.body;
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileNav = document.getElementById('mobileNav');
+            const desktopNav = document.querySelector('.desktop-nav');
+            
+            const createNationBtn = document.getElementById('createNationBtn');
+            const nationFormContainer = document.getElementById('nationFormContainer');
+            const nationForm = document.getElementById('nationForm');
+            const successMessage = document.getElementById('successMessage');
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const flagImage = document.getElementById('flagImage');
+            const fileName = document.getElementById('fileName');
+            const leaderInput = document.getElementById('leader');
+            const cooldownMessage = document.getElementById('cooldownMessage');
+            
+            const COOLDOWN_TIME = 60000;
+            const STORAGE_KEY = 'nation_shield_cooldown';
+            
+            function getUserIP() {
+                return new Promise((resolve) => {
+                    fetch('https://api.ipify.org?format=json')
+                        .then(response => response.json())
+                        .then(data => resolve(data.ip))
+                        .catch(() => {
+                            fetch('https://api64.ipify.org?format=json')
+                                .then(response => response.json())
+                                .then(data => resolve(data.ip))
+                                .catch(() => resolve('unknown'));
+                        });
+                });
+            }
+            
+            function checkCooldown() {
+                const cooldownData = localStorage.getItem(STORAGE_KEY);
+                if (!cooldownData) return null;
+                
+                const { ip, timestamp } = JSON.parse(cooldownData);
+                const now = Date.now();
+                const timeLeft = COOLDOWN_TIME - (now - timestamp);
+                
+                if (timeLeft > 0) {
+                    return { ip, timeLeft };
+                } else {
+                    localStorage.removeItem(STORAGE_KEY);
+                    return null;
+                }
+            }
+            
+            function setCooldown(ip) {
+                const cooldownData = {
+                    ip: ip,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(cooldownData));
+            }
+            
+            async function updateCooldownButton() {
+                const cooldown = checkCooldown();
+                
+                if (cooldown) {
+                    createNationBtn.disabled = true;
+                    cooldownMessage.style.display = 'block';
+                    
+                    const updateMessage = () => {
+                        const timeLeft = Math.ceil(cooldown.timeLeft / 1000);
+                        cooldownMessage.textContent = `Подождите ${timeLeft} секунд перед созданием нового государства`;
+                        
+                        if (timeLeft > 0) {
+                            cooldown.timeLeft -= 1000;
+                            setTimeout(updateMessage, 1000);
+                        } else {
+                            createNationBtn.disabled = false;
+                            cooldownMessage.style.display = 'none';
+                            localStorage.removeItem(STORAGE_KEY);
+                        }
+                    };
+                    
+                    updateMessage();
+                } else {
+                    createNationBtn.disabled = false;
+                    cooldownMessage.style.display = 'none';
+                }
+            }
+            
+            const font = new FontFace('Minecraft', 'url(https://raw.githubusercontent.com/NationShield/-/main/source/Minecraft.ttf)');
+            
+            font.load().then(function(loadedFont) {
+                document.fonts.add(loadedFont);
+                
+                setTimeout(function() {
+                    preloader.style.opacity = '0';
+                    
+                    setTimeout(function() {
+                        preloader.style.display = 'none';
+                        body.classList.add('loaded');
+                    }, 500);
+                }, 500);
+            }).catch(function(error) {
+                preloader.style.opacity = '0';
+                
+                setTimeout(function() {
+                    preloader.style.display = 'none';
+                    body.classList.add('loaded');
+                }, 500);
+            });
+            
+            updateCooldownButton();
+            
+            if (window.innerWidth <= 768) {
+                mobileMenuBtn.style.display = 'block';
+                desktopNav.style.display = 'none';
+                mobileNav.style.display = 'block';
+            } else {
+                mobileMenuBtn.style.display = 'none';
+                desktopNav.style.display = 'flex';
+                mobileNav.style.display = 'none';
+            }
+            
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768) {
+                    mobileMenuBtn.style.display = 'block';
+                    desktopNav.style.display = 'none';
+                    mobileNav.style.display = 'block';
+                } else {
+                    mobileMenuBtn.style.display = 'none';
+                    desktopNav.style.display = 'flex';
+                    mobileNav.style.display = 'none';
+                }
+            });
+            
+            let isMenuOpen = false;
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                isMenuOpen = !isMenuOpen;
+                
+                if (isMenuOpen) {
+                    mobileNav.classList.add('active');
+                } else {
+                    mobileNav.classList.remove('active');
+                }
+            });
+            
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+            
+            createNationBtn.addEventListener('click', function() {
+                const cooldown = checkCooldown();
+                if (cooldown) {
+                    alert(`Подождите ${Math.ceil(cooldown.timeLeft / 1000)} секунд перед созданием нового государства`);
+                    return;
+                }
+                
+                nationFormContainer.style.display = 'block';
+                createNationBtn.style.display = 'none';
+                nationFormContainer.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            cancelBtn.addEventListener('click', function() {
+                nationFormContainer.style.display = 'none';
+                createNationBtn.style.display = 'block';
+                nationForm.reset();
+                fileName.textContent = 'Файл не выбран';
+            });
+            
+            flagImage.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
+                } else {
+                    fileName.textContent = 'Файл не выбран';
+                }
+            });
+            
+            function validateTelegramUsername(username) {
+                const telegramPattern = /^@[a-zA-Z0-9_]{5,32}$/;
+                return telegramPattern.test(username);
+            }
+            
+            leaderInput.addEventListener('input', function(e) {
+                let value = this.value;
+                
+                if (value.length > 0 && !value.startsWith('@')) {
+                    value = '@' + value.replace(/^@+/, '');
+                    this.value = value;
+                }
+                
+                value = value.replace(/[^a-zA-Z0-9_@]/g, '');
+                
+                if (value.length > 1 && !value.startsWith('@')) {
+                    value = '@' + value.slice(1);
+                }
+                
+                this.value = value;
+            });
+            
+            leaderInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                if (value && !validateTelegramUsername(value)) {
+                    alert('Пожалуйста, введите корректный юзернейм Telegram (начинается с @, содержит только английские буквы, цифры и подчеркивания)');
+                    this.focus();
+                }
+            });
+            
+            nationForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const nationName = document.getElementById('nationName').value.trim();
+                const ideology = document.getElementById('ideology').value.trim();
+                const governmentForm = document.getElementById('governmentForm').value.trim();
+                const religion = document.getElementById('religion').value.trim();
+                const leader = document.getElementById('leader').value.trim();
+                const flagFile = flagImage.files[0];
+                
+                if (!nationName || !ideology || !governmentForm || !leader || !flagFile) {
+                    alert('Пожалуйста, заполните все обязательные поля!');
+                    return;
+                }
+                
+                if (!validateTelegramUsername(leader)) {
+                    alert('Пожалуйста, введите корректный юзернейм Telegram (начинается с @, содержит только английские буквы, цифры и подчеркивания)');
+                    leaderInput.focus();
+                    return;
+                }
+                
+                const cooldown = checkCooldown();
+                if (cooldown) {
+                    alert(`Подождите ${Math.ceil(cooldown.timeLeft / 1000)} секунд перед созданием нового государства`);
+                    return;
+                }
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Отправка...';
+                
+                const botToken = '7471360964:AAGbg0B8XfbuZUPdFWIcIidwbTjEqLvE70Y';
+                const chatId = '@NationShieldGroup';
+                
+                const message = `🏛️ *Название:* ${nationName}
+📜 *Идеология:* ${ideology}
+👑 *Форма правления:* ${governmentForm}
+🙏 *Религия:* ${religion || 'Не указана'}
+👤 *Лидер:* ${leader}`;
+                
+                try {
+                    const userIP = await getUserIP();
+                    
+                    if (flagFile.size > 20 * 1024 * 1024) {
+                        throw new Error('Файл слишком большой! Максимальный размер: 20MB');
+                    }
+                    
+                    const photoFormData = new FormData();
+                    photoFormData.append('chat_id', chatId);
+                    photoFormData.append('photo', flagFile);
+                    photoFormData.append('caption', message);
+                    photoFormData.append('parse_mode', 'Markdown');
+                    
+                    const photoResponse = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                        method: 'POST',
+                        body: photoFormData
+                    });
+                    
+                    const photoResult = await photoResponse.json();
+                    
+                    if (!photoResponse.ok) {
+                        throw new Error('Не удалось отправить изображение');
+                    }
+                    
+                    setCooldown(userIP);
+                    
+                    nationForm.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                        nationForm.style.display = 'block';
+                        nationForm.reset();
+                        fileName.textContent = 'Файл не выбран';
+                        createNationBtn.style.display = 'block';
+                        nationFormContainer.style.display = 'none';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Отправить на модерацию';
+                        
+                        updateCooldownButton();
+                    }, 5000);
+                    
+                } catch (error) {
+                    console.error('Ошибка отправки:', error);
+                    
+                    try {
+                        const userIP = await getUserIP();
+                        const textFormData = new FormData();
+                        textFormData.append('chat_id', chatId);
+                        textFormData.append('text', message + '\n\n⚠️ *Примечание:* Не удалось отправить изображение флага');
+                        textFormData.append('parse_mode', 'Markdown');
+                        
+                        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                            method: 'POST',
+                            body: textFormData
+                        });
+                        
+                        setCooldown(userIP);
+                        
+                        nationForm.style.display = 'none';
+                        successMessage.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            successMessage.style.display = 'none';
+                            nationForm.style.display = 'block';
+                            nationForm.reset();
+                            fileName.textContent = 'Файл не выбран';
+                            createNationBtn.style.display = 'block';
+                            nationFormContainer.style.display = 'none';
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Отправить на модерацию';
+                            
+                            updateCooldownButton();
+                        }, 5000);
+                        
+                    } catch (textError) {
+                        console.error('Ошибка отправки текста:', textError);
+                        alert('Произошла ошибка при отправке заявки. Пожалуйста, попробуйте снова.');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Отправить на модерацию';
+                    }
+                }
+            });
+            
+            let copyTimeout = null;
+            let isCopying = false;
+            const serverIp = document.getElementById('serverIp');
+            const originalText = serverIp.textContent;
+            
+            serverIp.addEventListener('click', function() {
+                if (isCopying) return;
+                
+                isCopying = true;
+                const ip = 'NationShield.aternos.me:44833';
+                
+                if (copyTimeout) {
+                    clearTimeout(copyTimeout);
+                }
+                
+                navigator.clipboard.writeText(ip).then(() => {
+                    serverIp.textContent = 'Скопировано!';
+                    serverIp.style.color = 'var(--accent-green)';
+                    serverIp.style.borderColor = 'var(--accent-green)';
+                    
+                    copyTimeout = setTimeout(() => {
+                        serverIp.textContent = originalText;
+                        serverIp.style.color = '';
+                        serverIp.style.borderColor = '';
+                        isCopying = false;
+                    }, 1500);
+                }).catch(err => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = ip;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    serverIp.textContent = 'Скопировано!';
+                    serverIp.style.color = 'var(--accent-green)';
+                    serverIp.style.borderColor = 'var(--accent-green)';
+                    
+                    copyTimeout = setTimeout(() => {
+                        serverIp.textContent = originalText;
+                        serverIp.style.color = '';
+                        serverIp.style.borderColor = '';
+                        isCopying = false;
+                    }, 1500);
+                });
+            });
+            
+            document.querySelector('.footer-link.discord').addEventListener('click', function(e) {
+                e.preventDefault();
+            });
+            
+            setInterval(updateCooldownButton, 1000);
+        });
+        
+        function switchTab(tabId) {
+            const footer = document.getElementById('mainFooter');
+            
+            document.querySelectorAll('.nav-tab, .mobile-nav-btn').forEach(t => {
+                t.classList.remove('active');
+            });
+            
+            document.querySelectorAll(`[data-tab="${tabId}"]`).forEach(t => {
+                t.classList.add('active');
+            });
+            
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'home') {
+                footer.classList.add('active');
+            } else {
+                footer.classList.remove('active');
+            }
+            
+            if (window.innerWidth <= 768) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+        
+        document.getElementById('homeTab').addEventListener('click', function(e) {
+            e.preventDefault();
+            switchTab('home');
+        });
+    </script>
+</body>
+</html>
