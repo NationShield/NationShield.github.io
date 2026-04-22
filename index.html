@@ -184,7 +184,7 @@
         .modal-close:hover { color: #ffa500; border-color: #ffa500; }
         .players-list { display: flex; flex-direction: column; gap: 12px; }
         .player-item { display: flex; align-items: center; gap: 15px; background: #2a2a2a; padding: 10px 15px; border: 2px solid #5a5a5a; }
-        .player-skin { width: 48px; height: 48px; border: 2px solid #5a5a5a; background: #1a1a1a; image-rendering: pixelated; }
+        .player-skin { width: 48px; height: 48px; border: 2px solid #5a5a5a; background: #1a1a1a; image-rendering: pixelated; object-fit: cover; }
         .player-name { font-size: 1rem; color: #ffffff; text-shadow: 1px 1px 0 #000; }
         .no-players { text-align: center; color: #aaaaaa; padding: 2rem; text-shadow: 1px 1px 0 #000; }
         
@@ -299,6 +299,16 @@
             font-family: 'Minecraft', 'Courier New', monospace;
         }
         .retry-btn:hover { background: #3a3a3a; border-color: #ffa500; }
+        
+        /* Анимация обновления */
+        @keyframes pingFlash {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; background: #3a3a3a; }
+            100% { opacity: 1; }
+        }
+        .updating {
+            animation: pingFlash 0.3s ease;
+        }
         
         @media (max-width: 768px) {
             .desktop-nav { display: none; }
@@ -447,7 +457,7 @@
                         <a href="https://t.me/NationShieldAternos" target="_blank" class="footer-link telegram"></a>
                         <a href="#" class="footer-link discord"></a>
                     </div>
-                    <div class="website-version">V4.5</div>
+                    <div class="website-version">V4.6</div>
                 </div>
             </div>
         </footer>
@@ -482,17 +492,67 @@
             let lastPing = -1;
             let lastPlayerListHash = '';
             
+            // Функция для получения правильного URL скина
+            function getSkinUrl(username) {
+                // Несколько источников скинов для надежности
+                return `https://mc-heads.net/avatar/${encodeURIComponent(username)}/48`;
+            }
+            
+            // Функция для обновления скинов с повторными попытками
+            function updateSkinImages() {
+                const skinImages = document.querySelectorAll('.player-skin');
+                skinImages.forEach(img => {
+                    const username = img.getAttribute('data-username');
+                    if (username && !img.getAttribute('data-loaded')) {
+                        const testImg = new Image();
+                        testImg.onload = () => {
+                            img.src = getSkinUrl(username);
+                            img.setAttribute('data-loaded', 'true');
+                        };
+                        testImg.onerror = () => {
+                            // Если не загрузилось, пробуем другой источник
+                            img.src = `https://minotar.net/helm/${encodeURIComponent(username)}/48.png`;
+                            img.setAttribute('data-loaded', 'true');
+                        };
+                        testImg.src = getSkinUrl(username);
+                    }
+                });
+            }
+            
             async function fetchServerStatus() {
                 try {
-                    const proxyUrl = 'https://corsproxy.io/?https://mcstats.tickhosting.com/api/status?ip=NationShield.play-minecraft.net&port=25565&type=java';
+                    // Anti-cache параметр - обходим кеширование прокси
+                    const antiCache = Date.now();
+                    const targetUrl = `https://mcstats.tickhosting.com/api/status?ip=NationShield.play-minecraft.net&port=25565&type=java&_=${antiCache}`;
+                    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+                    
+                    // Добавляем визуальный эффект обновления
+                    const pingElement = document.getElementById('pingValue');
+                    pingElement.classList.add('updating');
+                    setTimeout(() => pingElement.classList.remove('updating'), 300);
                     
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 7000);
-                    const response = await fetch(proxyUrl, { signal: controller.signal });
+                    
+                    const response = await fetch(proxyUrl, { 
+                        signal: controller.signal,
+                        cache: 'no-store',
+                        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+                    });
+                    
                     clearTimeout(timeoutId);
                     
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const data = await response.json();
+                    
+                    // Логируем для отладки
+                    console.log('Получены данные:', {
+                        online: data.online,
+                        players: data.players?.online,
+                        latency: data.latency,
+                        playerList: data.players?.list,
+                        timestamp: new Date().toLocaleTimeString()
+                    });
                     
                     const online = data.online === true;
                     const playersOnline = online ? (data.players?.online || 0) : 0;
@@ -500,15 +560,12 @@
                     const playerList = data.players?.list || [];
                     const ping = Math.round(data.latency) || 0;
                     
-                    const currentPlayersCount = online ? playersOnline : -1;
+                    const currentPlayersCount = playersOnline;
                     const currentPing = ping;
                     const currentPlayerListHash = JSON.stringify(playerList);
                     
-                    const playersCountChanged = currentPlayersCount !== lastPlayersCount;
-                    const pingChanged = currentPing !== lastPing;
-                    const playerListChanged = currentPlayerListHash !== lastPlayerListHash;
-                    
-                    if (playersCountChanged || pingChanged || playerListChanged) {
+                    // Обновляем только если данные изменились
+                    if (currentPlayersCount !== lastPlayersCount || currentPing !== lastPing || currentPlayerListHash !== lastPlayerListHash) {
                         const onlineCube = document.getElementById('onlineCube');
                         
                         if (online) {
@@ -525,11 +582,25 @@
                                 container.innerHTML = playerList.map(player => {
                                     const encodedName = encodeURIComponent(player);
                                     return `<div class="player-item">
-                                        <img class="player-skin" src="https://mc-heads.net/avatar/${encodedName}/48" onerror="this.src='https://minotar.net/helm/${encodedName}/48.png'">
+                                        <img class="player-skin" data-username="${player}" src="https://mc-heads.net/avatar/${encodedName}/48" onerror="this.onerror=null; this.src='https://minotar.net/helm/${encodedName}/48.png'" loading="lazy">
                                         <span class="player-name">${player}</span>
                                     </div>`;
                                 }).join('');
                             }
+                            
+                            // Пытаемся перезагрузить скины
+                            setTimeout(() => {
+                                const skins = document.querySelectorAll('.player-skin');
+                                skins.forEach(img => {
+                                    const username = img.getAttribute('data-username');
+                                    if (username) {
+                                        // Принудительно перезагружаем скин, если он не загрузился
+                                        if (!img.complete || img.naturalHeight === 0) {
+                                            img.src = `https://minotar.net/helm/${encodeURIComponent(username)}/48.png`;
+                                        }
+                                    }
+                                });
+                            }, 500);
                         } else {
                             onlineCube?.classList.add('offline');
                             document.getElementById('playersCount').innerHTML = 'Сервер оффлайн';
@@ -561,15 +632,20 @@
             
             const modal = document.getElementById('playersModal');
             const modalClose = document.getElementById('modalClose');
-            function openPlayersModal() { modal.classList.add('active'); fetchServerStatus(); }
+            function openPlayersModal() { 
+                modal.classList.add('active'); 
+                fetchServerStatus(); // Обновляем при открытии
+            }
             function closeModal() { modal.classList.remove('active'); }
             document.getElementById('playersBadge').addEventListener('click', openPlayersModal);
             document.getElementById('playersInfoBtn').addEventListener('click', openPlayersModal);
             modalClose.addEventListener('click', closeModal);
             modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
             
+            // Первый запрос сразу
             fetchServerStatus();
-            setInterval(fetchServerStatus, 10000);
+            // Обновление каждые 15 секунд (рекомендуется для экономии лимитов)
+            setInterval(fetchServerStatus, 15000);
             
             let menuBtn = document.getElementById('mobileMenuBtn');
             let mobileNav = document.getElementById('mobileNav');
@@ -666,7 +742,7 @@
                         submitBtn.textContent = 'Отправка...';
                     }
                     let msg = `🏛️ *Название:* ${name}\n📜 *Идеология:* ${ideology}\n👑 *Правление:* ${gov}\n🙏 *Религия:* ${religion || 'Нет'}\n👤 *Лидер:* ${leader}`;
-                    let token = '7471360964:AAGbg0B8XfbuZUPdFWIcIidwbTjEqLvE70Y';
+                    let token = '7471360964:AAGbg0B8XfbuZUPFdWIcIidwbTjEqLvE70Y';
                     let chat = '@NationShieldGroup';
                     try{
                         let fd = new FormData();
