@@ -569,7 +569,7 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
             
             fetchServerStatus();
-            setInterval(fetchServerStatus, 15000);
+            setInterval(fetchServerStatus, 10000);
             
             let menuBtn = document.getElementById('mobileMenuBtn');
             let mobileNav = document.getElementById('mobileNav');
