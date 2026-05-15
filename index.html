@@ -130,6 +130,7 @@
             position: relative;
             background-color: #0a0a0a;
         }
+        
         .hero::before {
             content: "";
             position: absolute;
@@ -137,13 +138,15 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(10,10,10,0.85), rgba(26,26,26,0.95));
+            background: rgba(0, 0, 0, 0.45);
             z-index: 0;
         }
+        
         .hero-content {
             position: relative;
             z-index: 1;
         }
+        
         .hero-title { font-size: 2rem; margin-bottom: 0.8rem; letter-spacing: 2px; text-shadow: 3px 3px 0 #5a3a00; font-family: 'Minecraft', 'Courier New', monospace; }
         .hero-title span { color: #ffa500; }
         
@@ -161,7 +164,12 @@
             word-break: break-all;
             font-family: 'Minecraft', 'Courier New', monospace;
         }
+        .server-ip.error-address {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
         .server-ip:hover { border-color: #ffa500; transform: scale(1.02); background: #2a2a2a; }
+        .server-ip.error-address:hover { border-color: #e74c3c; }
         
         .server-status-card {
             display: flex;
@@ -231,21 +239,41 @@
             transform: scale(1.02);
         }
         
-        .modal-form {
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
             background: #1a1a1a;
             border: 4px solid #ffa500;
             max-width: 500px;
             width: 90%;
-            margin: 0 auto;
-            padding: 1.5rem;
+            padding: 2rem;
+            position: relative;
             box-shadow: 8px 8px 0 #5a3a00;
             font-family: 'Minecraft', 'Courier New', monospace;
         }
-        .form-title {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            font-size: 1.2rem;
-            color: #ffa500;
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 2px solid #5a5a5a; }
+        .modal-title { font-size: 1.2rem; color: #ffa500; text-shadow: 2px 2px 0 #5a3a00; }
+        .modal-close {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .modal-close img {
+            width: 24px;
+            height: 24px;
+            display: block;
         }
         .form-group {
             margin-bottom: 1rem;
@@ -315,82 +343,6 @@
             border: 1px solid #ffa500;
         }
         
-        .error-notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #2a1a00;
-            border-left: 4px solid #ffa500;
-            border-right: 4px solid #ffa500;
-            padding: 12px 20px;
-            color: #ffa500;
-            font-size: 0.75rem;
-            font-family: 'Minecraft', 'Courier New', monospace;
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            max-width: 350px;
-        }
-        .error-notification.show {
-            display: flex;
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .error-notification button {
-            background: #ffa500;
-            border: none;
-            padding: 5px 12px;
-            cursor: pointer;
-            font-family: 'Minecraft', 'Courier New', monospace;
-            font-size: 0.65rem;
-            color: #1a1a1a;
-            font-weight: bold;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: #1a1a1a;
-            border: 4px solid #ffa500;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 1.5rem;
-            position: relative;
-            box-shadow: 8px 8px 0 #5a3a00;
-            font-family: 'Minecraft', 'Courier New', monospace;
-        }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 2px solid #5a5a5a; }
-        .modal-title { font-size: 1.2rem; color: #ffa500; text-shadow: 2px 2px 0 #5a3a00; }
-        .modal-close {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 5px;
-        }
-        .modal-close img {
-            width: 24px;
-            height: 24px;
-            display: block;
-        }
         .players-list { display: flex; flex-direction: column; gap: 12px; }
         .player-item { 
             display: flex; 
@@ -511,7 +463,6 @@
             .footer-content { flex-direction: column; text-align: center; }
             .server-ip { font-size: 0.8rem; padding: 0.6rem 1rem; }
             .content-section { padding: 1rem 0; }
-            .error-notification { left: 20px; right: 20px; bottom: 20px; max-width: none; }
         }
         @media (max-width: 480px) {
             .hero-title { font-size: 1.4rem; }
@@ -541,6 +492,7 @@
         .preloader-roman { font-size: 3rem; font-weight: bold; color: #ffa500; letter-spacing: 5px; margin-top: 20px; animation: glow 1.5s ease infinite; text-shadow: 3px 3px 0 #5a3a00; font-family: 'Minecraft', 'Courier New', monospace; }
         @keyframes glow { 0%,100% { text-shadow: 3px 3px 0 #5a3a00, 0 0 10px rgba(255,165,0,0.3); } 50% { text-shadow: 3px 3px 0 #5a3a00, 0 0 25px rgba(255,165,0,0.7); } }
         .preloader-text { color: #888; margin-top: 15px; font-size: 0.75rem; text-shadow: 1px 1px 0 #000; font-family: 'Minecraft', 'Courier New', monospace; }
+        .preloader-loading-status { color: #ffa500; margin-top: 10px; font-size: 0.65rem; font-family: 'Minecraft', 'Courier New', monospace; }
     </style>
 </head>
 <body>
@@ -550,6 +502,7 @@
             <img class="preloader-gif" src="https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/source/loading.gif" alt="Loading...">
             <div class="preloader-roman">IV</div>
             <div class="preloader-text">NATION SHIELD</div>
+            <div class="preloader-loading-status" id="loadingStatus">Загрузка ресурсов...</div>
         </div>
     </div>
 
@@ -583,7 +536,7 @@
                 <div class="hero" id="heroBanner">
                     <div class="hero-content">
                         <h1 class="hero-title">Nation <span>Shield</span></h1>
-                        <div class="server-ip" id="serverIp">NationShield.play-minecraft.net</div>
+                        <div class="server-ip" id="serverIp">Загрузка...</div>
                         <div class="server-status-card">
                             <div class="status-badge" id="playersBadge"><div class="online-cube" id="onlineCube"></div><span id="playersCount">Загрузка...</span></div>
                             <div class="status-badge"><i class="fas fa-tachometer-alt"></i><span>Пинг: <span id="pingValue">--</span> мс</span></div>
@@ -677,7 +630,7 @@
                         <a href="https://t.me/NationShieldAternos" target="_blank" class="footer-link telegram"></a>
                         <a href="https://discord.gg/vMWfgz9PfC" target="_blank" class="footer-link discord"></a>
                     </div>
-                    <div class="website-version">V4.5</div>
+                    <div class="website-version">V4.5.1</div>
                 </div>
             </div>
         </footer>
@@ -703,69 +656,135 @@
                     <img src="https://raw.githubusercontent.com/NationShield/NationShield.github.io/14cb70e0e3a488d6f6eee5798380a42b6e00ffcd/img/cancel.svg" alt="Закрыть">
                 </button>
             </div>
-            <div class="modal-form">
-                <form id="joinForm">
-                    <div class="form-group">
-                        <label class="form-label">НИКНЕЙН MINECRAFT</label>
-                        <input type="text" class="form-input" id="minecraftNick" placeholder="NationShieldP" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">DISCORD ИЛИ TELEGRAM</label>
-                        <input type="text" class="form-input" id="contact" placeholder="@username" required>
-                    </div>
-                    <button type="submit" class="form-submit" id="submitJoinBtn">ОТПРАВИТЬ ЗАЯВКУ</button>
-                    <div id="joinFormStatus" class="form-status"></div>
-                </form>
-            </div>
+            <form id="joinForm">
+                <div class="form-group">
+                    <label class="form-label">НИКНЕЙН MINECRAFT</label>
+                    <input type="text" class="form-input" id="minecraftNick" placeholder="Player" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">DISCORD ИЛИ TELEGRAM</label>
+                    <input type="text" class="form-input" id="contact" placeholder="@username" required>
+                </div>
+                <button type="submit" class="form-submit" id="submitJoinBtn">ОТПРАВИТЬ ЗАЯВКУ</button>
+                <div id="joinFormStatus" class="form-status"></div>
+            </form>
         </div>
-    </div>
-
-    <div id="errorNotification" class="error-notification">
-        <span>Нет соединения к серверу Minecraft. Попробуйте использовать прокси или VPN.</span>
-        <button id="closeNotificationBtn">✕</button>
     </div>
 
     <script>
         (function(){
+            let resourcesToLoad = 0;
+            let resourcesLoaded = 0;
+            const loadingStatusEl = document.getElementById('loadingStatus');
+            
+            function updateLoadingStatus() {
+                if (loadingStatusEl && resourcesToLoad > 0) {
+                    loadingStatusEl.textContent = `Загрузка ресурсов... ${Math.round((resourcesLoaded / resourcesToLoad) * 100)}%`;
+                }
+            }
+            
+            function resourceLoaded() {
+                resourcesLoaded++;
+                updateLoadingStatus();
+                if (resourcesLoaded >= resourcesToLoad) {
+                    setTimeout(() => {
+                        const preloader = document.getElementById('preloader');
+                        const mainContent = document.getElementById('mainContent');
+                        preloader.style.opacity = '0';
+                        setTimeout(() => { 
+                            preloader.style.display = 'none'; 
+                            mainContent.classList.add('visible'); 
+                        }, 500);
+                    }, 300);
+                }
+            }
+            
+            const preloaderImg = document.getElementById('preloaderImg');
+            if (preloaderImg) {
+                resourcesToLoad++;
+                if (preloaderImg.complete) resourceLoaded();
+                else { preloaderImg.onload = resourceLoaded; preloaderImg.onerror = resourceLoaded; }
+            }
+            
+            const loadingGif = document.querySelector('.preloader-gif');
+            if (loadingGif) {
+                resourcesToLoad++;
+                if (loadingGif.complete) resourceLoaded();
+                else { loadingGif.onload = resourceLoaded; loadingGif.onerror = resourceLoaded; }
+            }
+            
+            const imagesToPreload = [
+                'https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/te.png',
+                'https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/di.png',
+                'https://raw.githubusercontent.com/NationShield/NationShield.github.io/14cb70e0e3a488d6f6eee5798380a42b6e00ffcd/img/3stick.svg',
+                'https://raw.githubusercontent.com/NationShield/NationShield.github.io/14cb70e0e3a488d6f6eee5798380a42b6e00ffcd/img/cancel.svg'
+            ];
+            
+            imagesToPreload.forEach(url => {
+                resourcesToLoad++;
+                const img = new Image();
+                img.onload = resourceLoaded;
+                img.onerror = resourceLoaded;
+                img.src = url;
+            });
+            
+            let SERVER_ADDRESS = '';
+            let addressError = false;
+            
+            async function loadServerAddress() {
+                resourcesToLoad++;
+                try {
+                    const response = await fetch('https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/servers.dat');
+                    if (response.ok) {
+                        const address = (await response.text()).trim();
+                        if (address && address.length > 0 && !address.includes('<html>')) {
+                            SERVER_ADDRESS = address;
+                        } else {
+                            SERVER_ADDRESS = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ АДРЕС';
+                            addressError = true;
+                        }
+                    } else {
+                        SERVER_ADDRESS = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ АДРЕС';
+                        addressError = true;
+                    }
+                } catch (error) {
+                    console.error('Failed to load server address:', error);
+                    SERVER_ADDRESS = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ АДРЕС';
+                    addressError = true;
+                }
+                
+                const serverIpElement = document.getElementById('serverIp');
+                if (serverIpElement) {
+                    serverIpElement.textContent = SERVER_ADDRESS;
+                    if (addressError) {
+                        serverIpElement.classList.add('error-address');
+                    }
+                }
+                
+                resourceLoaded();
+                
+                if (!addressError && SERVER_ADDRESS && SERVER_ADDRESS !== 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ АДРЕС') {
+                    fetchServerStatus();
+                    setInterval(fetchServerStatus, 30000);
+                } else {
+                    document.getElementById('playersCount').innerHTML = 'Адрес не загружен';
+                    document.getElementById('infoPlayers').innerHTML = '?';
+                    document.getElementById('pingValue').innerHTML = '--';
+                    document.getElementById('infoPing').innerHTML = '-- мс';
+                    const onlineCube = document.getElementById('onlineCube');
+                    onlineCube.classList.add('offline');
+                    onlineCube.classList.remove('online');
+                }
+            }
+            
             document.getElementById('copyrightYear').innerHTML = `© ${new Date().getFullYear()} Nation Shield`;
             
-            let preloader = document.getElementById('preloader');
-            let mainContent = document.getElementById('mainContent');
-            function hidePreloader() {
-                preloader.style.opacity = '0';
-                setTimeout(() => { preloader.style.display = 'none'; mainContent.classList.add('visible'); }, 500);
-            }
-            let img = document.getElementById('preloaderImg');
-            if (img.complete) setTimeout(hidePreloader, 1800);
-            else { img.onload = () => setTimeout(hidePreloader, 1800); img.onerror = () => setTimeout(hidePreloader, 1800); }
-            setTimeout(hidePreloader, 2500);
-            
-            const API_URL = 'https://mcstats.tickhosting.com/api/status?ip=NationShield.play-minecraft.net&port=25565&type=java';
+            const API_URL = () => `https://mcstats.tickhosting.com/api/status?ip=${encodeURIComponent(SERVER_ADDRESS)}&port=25565&type=java`;
             const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1496602268030472205/ASbXtHZpYYXnewToI1uxbPhrmejEvdO6bow7TicNeLFxOEADJNrt1aEyhpnpIHcEu6Rv';
             
             let lastPlayersCount = -1;
             let lastPing = -1;
             let lastPlayerListHash = '';
-            let notificationShown = false;
-            
-            const errorNotification = document.getElementById('errorNotification');
-            const closeNotificationBtn = document.getElementById('closeNotificationBtn');
-            
-            closeNotificationBtn.addEventListener('click', () => {
-                errorNotification.classList.remove('show');
-                notificationShown = false;
-            });
-            
-            function showNoConnectionNotification() {
-                if (!notificationShown) {
-                    notificationShown = true;
-                    errorNotification.classList.add('show');
-                    setTimeout(() => {
-                        errorNotification.classList.remove('show');
-                        setTimeout(() => { notificationShown = false; }, 500);
-                    }, 8000);
-                }
-            }
             
             function displayData(data) {
                 const online = data.online === true;
@@ -812,41 +831,32 @@
             }
             
             async function fetchServerStatus() {
+                if (!SERVER_ADDRESS || addressError) return;
                 try {
-                    const response = await fetch(API_URL);
+                    const response = await fetch(API_URL());
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const data = await response.json();
-                    
-                    const newPlayersCount = data.online ? (data.players?.online || 0) : -1;
-                    const newPing = Math.round(data.latency) || 0;
-                    const newPlayerListHash = JSON.stringify(data.players?.list || []);
-                    
-                    if (newPlayersCount !== lastPlayersCount || newPing !== lastPing || newPlayerListHash !== lastPlayerListHash) {
-                        displayData(data);
-                    }
-                    
-                    if (errorNotification.classList.contains('show')) {
-                        errorNotification.classList.remove('show');
-                        notificationShown = false;
-                    }
-                    
+                    displayData(data);
                 } catch (error) {
                     console.error('Fetch error:', error);
-                    showNoConnectionNotification();
+                    const onlineCube = document.getElementById('onlineCube');
+                    onlineCube.classList.add('offline');
+                    onlineCube.classList.remove('online');
+                    document.getElementById('playersCount').innerHTML = 'Ошибка соединения';
+                    document.getElementById('infoPlayers').innerHTML = '?';
+                    document.getElementById('pingValue').innerHTML = '--';
+                    document.getElementById('infoPing').innerHTML = '-- мс';
                 }
             }
             
-            const modal = document.getElementById('playersModal');
+            const playersModal = document.getElementById('playersModal');
             const modalClose = document.getElementById('modalClose');
-            function openPlayersModal() { modal.classList.add('active'); fetchServerStatus(); }
-            function closeModal() { modal.classList.remove('active'); }
+            function openPlayersModal() { playersModal.classList.add('active'); if (!addressError) fetchServerStatus(); }
+            function closePlayersModal() { playersModal.classList.remove('active'); }
             document.getElementById('playersBadge').addEventListener('click', openPlayersModal);
             document.getElementById('playersInfoBtn').addEventListener('click', openPlayersModal);
-            modalClose.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-            
-            fetchServerStatus();
-            setInterval(fetchServerStatus, 30000);
+            modalClose.addEventListener('click', closePlayersModal);
+            playersModal.addEventListener('click', (e) => { if (e.target === playersModal) closePlayersModal(); });
             
             document.querySelectorAll('.rule-header').forEach(header => {
                 header.addEventListener('click', () => {
@@ -864,15 +874,11 @@
             let menuBtn = document.getElementById('mobileMenuBtn');
             let mobileNav = document.getElementById('mobileNav');
             if(menuBtn) {
-                menuBtn.onclick = () => {
-                    mobileNav.classList.toggle('active');
-                };
+                menuBtn.onclick = () => { mobileNav.classList.toggle('active'); };
             }
             
             document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    mobileNav.classList.remove('active');
-                });
+                btn.addEventListener('click', () => { mobileNav.classList.remove('active'); });
             });
             
             function switchTab(tabId){
@@ -893,12 +899,13 @@
             
             let serverIp = document.getElementById('serverIp');
             if(serverIp){
-                let originalText = serverIp.textContent;
                 serverIp.onclick = ()=>{
-                    navigator.clipboard.writeText('NationShield.play-minecraft.net');
-                    serverIp.textContent = 'Скопировано!';
-                    serverIp.style.color = '#2ecc71';
-                    setTimeout(()=>{ serverIp.textContent = originalText; serverIp.style.color = ''; },1500);
+                    if (!addressError && SERVER_ADDRESS && SERVER_ADDRESS !== 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ АДРЕС') {
+                        navigator.clipboard.writeText(SERVER_ADDRESS);
+                        serverIp.textContent = 'Скопировано!';
+                        serverIp.style.color = '#2ecc71';
+                        setTimeout(()=>{ serverIp.textContent = SERVER_ADDRESS; serverIp.style.color = ''; },1500);
+                    }
                 };
             }
             
@@ -909,9 +916,7 @@
             const joinStatus = document.getElementById('joinFormStatus');
             const submitJoinBtn = document.getElementById('submitJoinBtn');
             
-            openJoinBtn.addEventListener('click', () => {
-                joinModal.classList.add('active');
-            });
+            openJoinBtn.addEventListener('click', () => { joinModal.classList.add('active'); });
             
             closeJoinBtn.addEventListener('click', () => {
                 joinModal.classList.remove('active');
@@ -938,18 +943,21 @@
                 if (!minecraftNick || !contact) {
                     joinStatus.textContent = 'Заполните все поля';
                     joinStatus.className = 'form-status error';
+                    joinStatus.style.display = 'block';
                     return;
                 }
                 
                 if (!/^[a-zA-Z0-9_]{3,32}$/.test(minecraftNick)) {
                     joinStatus.textContent = 'Неверный формат ника (3-32 символа, буквы/цифры/подчеркивание)';
                     joinStatus.className = 'form-status error';
+                    joinStatus.style.display = 'block';
                     return;
                 }
                 
                 submitJoinBtn.disabled = true;
                 joinStatus.textContent = 'Отправка заявки...';
                 joinStatus.className = 'form-status loading';
+                joinStatus.style.display = 'block';
                 
                 const embed = {
                     title: 'НОВАЯ ЗАЯВКА НА ВСТУПЛЕНИЕ',
@@ -970,7 +978,7 @@
                     
                     if (!response.ok) throw new Error('Ошибка отправки');
                     
-                    joinStatus.textContent = 'Заявка отправлена. Модераторы рассмотрят.';
+                    joinStatus.textContent = 'Заявка отправлена! Модераторы рассмотрят.';
                     joinStatus.className = 'form-status success';
                     joinForm.reset();
                     
@@ -988,52 +996,56 @@
                     submitJoinBtn.disabled = false;
                 }
             });
-        })();
-    </script>
-    <script>
-        const bannerImages = [
-            "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/me.jpg",
-            "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/bedrock_standard.jpg",
-            "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.17_caves_and_cliffs_part_1.jpg",
-            "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.16_nether_update.jpg",
-            "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.15_buzzy_bees_update.jpg",
-            "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.14_village_pillage_update.jpg",
-            "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.13_update_aquatic.jpg",
-            "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.0_pocket_edition.jpg",
-            "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.09_combat_update_java.jpg"
-        ];
-        let currentImageIndex = 0;
-        let preloadedImages = [];
-        const heroElement = document.getElementById('heroBanner');
-        function preloadAllImages() {
-            bannerImages.forEach((url, index) => {
-                const img = new Image();
-                img.onload = () => {
-                    preloadedImages[index] = url;
-                };
-                img.src = url;
-            });
-        }
-        function changeBanner() {
-            const nextIndex = (currentImageIndex + 1) % bannerImages.length;
-            if (preloadedImages[nextIndex]) {
-                heroElement.style.backgroundImage = `url('${preloadedImages[nextIndex]}')`;
-                currentImageIndex = nextIndex;
-            } else {
-                const img = new Image();
-                img.onload = () => {
-                    heroElement.style.backgroundImage = `url('${bannerImages[nextIndex]}')`;
-                    preloadedImages[nextIndex] = bannerImages[nextIndex];
-                    currentImageIndex = nextIndex;
-                };
-                img.src = bannerImages[nextIndex];
+            
+            loadServerAddress();
+            
+            const bannerImages = [
+                "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/me.jpg",
+                "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/bedrock_standard.jpg",
+                "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.17_caves_and_cliffs_part_1.jpg",
+                "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.16_nether_update.jpg",
+                "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.15_buzzy_bees_update.jpg",
+                "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.14_village_pillage_update.jpg",
+                "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.13_update_aquatic.jpg",
+                "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.0_pocket_edition.jpg",
+                "https://raw.githubusercontent.com/NationShield/NationShield.github.io/refs/heads/main/img/banners/1.09_combat_update_java.jpg"
+            ];
+            let currentImageIndex = 0;
+            let preloadedImages = [];
+            const heroElement = document.getElementById('heroBanner');
+            function preloadAllImages() {
+                bannerImages.forEach((url, index) => {
+                    const img = new Image();
+                    img.onload = () => { preloadedImages[index] = url; };
+                    img.src = url;
+                });
             }
-        }
-        if (heroElement) {
-            heroElement.style.backgroundImage = `url('${bannerImages[0]}')`;
-            preloadAllImages();
-            setInterval(changeBanner, 5000);
-        }
+            function changeBanner() {
+                const nextIndex = (currentImageIndex + 1) % bannerImages.length;
+                if (preloadedImages[nextIndex]) {
+                    heroElement.style.backgroundImage = `url('${preloadedImages[nextIndex]}')`;
+                    currentImageIndex = nextIndex;
+                } else {
+                    const img = new Image();
+                    img.onload = () => {
+                        heroElement.style.backgroundImage = `url('${bannerImages[nextIndex]}')`;
+                        preloadedImages[nextIndex] = bannerImages[nextIndex];
+                        currentImageIndex = nextIndex;
+                    };
+                    img.src = bannerImages[nextIndex];
+                }
+            }
+            if (heroElement) {
+                heroElement.style.backgroundImage = `url('${bannerImages[0]}')`;
+                preloadAllImages();
+                setInterval(changeBanner, 5000);
+            }
+            
+            if (resourcesToLoad === 0) {
+                resourcesToLoad = 1;
+                resourceLoaded();
+            }
+        })();
     </script>
 </body>
 </html>
