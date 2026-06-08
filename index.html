@@ -147,8 +147,7 @@
             z-index: 1;
         }
         
-        .hero-title { font-size: 2rem; margin-bottom: 0.8rem; letter-spacing: 2px; text-shadow: 3px 3px 0 #4C1D95; font-family: 'Minecraft', 'Courier New', monospace; }
-        .hero-title span { color: #8B5CF6; }
+        .hero-title { font-size: 2rem; margin-bottom: 0.8rem; letter-spacing: 2px; text-shadow: 3px 3px 0 #4C1D95; font-family: 'Minecraft', 'Courier New', monospace; color: #8B5CF6; }
         
         .server-ip {
             background: #1a1a1a;
@@ -488,7 +487,6 @@
             animation: imagePulse 1.5s ease infinite;
         }
         @keyframes imagePulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px rgba(139,92,246,0.3); } 50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(139,92,246,0.6); } }
-        .preloader-gif { width: 64px; height: 64px; margin: 20px auto; display: block; image-rendering: pixelated; }
         .preloader-roman { font-size: 3rem; font-weight: bold; color: #8B5CF6; letter-spacing: 5px; margin-top: 20px; animation: glow 1.5s ease infinite; text-shadow: 3px 3px 0 #4C1D95; font-family: 'Minecraft', 'Courier New', monospace; }
         @keyframes glow { 0%,100% { text-shadow: 3px 3px 0 #4C1D95, 0 0 10px rgba(139,92,246,0.3); } 50% { text-shadow: 3px 3px 0 #4C1D95, 0 0 25px rgba(139,92,246,0.7); } }
         .preloader-text { color: #888; margin-top: 15px; font-size: 0.75rem; text-shadow: 1px 1px 0 #000; font-family: 'Minecraft', 'Courier New', monospace; }
@@ -499,7 +497,6 @@
     <div id="preloader">
         <div class="preloader-content">
             <img class="preloader-image" id="preloaderImg" src="img/server2.jpg" alt="YupiShald">
-            <img class="preloader-gif" src="source/loading.gif" alt="Loading...">
             <div class="preloader-roman">IV</div>
             <div class="preloader-text">YUPI SHALD</div>
             <div class="preloader-loading-status" id="loadingStatus">Загрузка ресурсов...</div>
@@ -627,10 +624,10 @@
                 <div class="footer-content">
                     <div class="footer-left" id="copyrightYear"></div>
                     <div class="footer-right">
-                        <a href="https://t.me/NationShieldAternos" target="_blank" class="footer-link telegram"></a>
-                        <a href="https://discord.gg/vMWfgz9PfC" target="_blank" class="footer-link discord"></a>
+                        <a href="javascript:void(0)" class="footer-link telegram"></a>
+                        <a href="javascript:void(0)" class="footer-link discord"></a>
                     </div>
-                    <div class="website-version">V4.5.1</div>
+                    <div class="website-version">V1.0</div>
                 </div>
             </div>
         </footer>
@@ -706,12 +703,6 @@
                 else { preloaderImg.onload = resourceLoaded; preloaderImg.onerror = resourceLoaded; }
             }
             
-            const loadingGif = document.querySelector('.preloader-gif');
-            if (loadingGif) {
-                resourcesToLoad++;
-                if (loadingGif.complete) resourceLoaded();
-                else { loadingGif.onload = resourceLoaded; loadingGif.onerror = resourceLoaded; }
-            }
             
             const imagesToPreload = [
                 'img/te.png',
@@ -728,53 +719,16 @@
                 img.src = url;
             });
             
-            let SERVER_ADDRESS = '';
+            let SERVER_ADDRESS = 'Yupishald.play-creative.com';
             let addressError = false;
             
-            async function loadServerAddress() {
-                resourcesToLoad++;
-                try {
-                    const response = await fetch('servers.dat');
-                    if (response.ok) {
-                        const address = (await response.text()).trim();
-                        if (address && address.length > 0 && !address.includes('<html>')) {
-                            SERVER_ADDRESS = address;
-                        } else {
-                            SERVER_ADDRESS = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ АДРЕС';
-                            addressError = true;
-                        }
-                    } else {
-                        SERVER_ADDRESS = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ АДРЕС';
-                        addressError = true;
-                    }
-                } catch (error) {
-                    console.error('Failed to load server address:', error);
-                    SERVER_ADDRESS = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ АДРЕС';
-                    addressError = true;
-                }
-                
+            function loadServerAddress() {
                 const serverIpElement = document.getElementById('serverIp');
                 if (serverIpElement) {
                     serverIpElement.textContent = SERVER_ADDRESS;
-                    if (addressError) {
-                        serverIpElement.classList.add('error-address');
-                    }
                 }
-                
-                resourceLoaded();
-                
-                if (!addressError && SERVER_ADDRESS && SERVER_ADDRESS !== 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ АДРЕС') {
-                    fetchServerStatus();
-                    setInterval(fetchServerStatus, 30000);
-                } else {
-                    document.getElementById('playersCount').innerHTML = 'Адрес не загружен';
-                    document.getElementById('infoPlayers').innerHTML = '?';
-                    document.getElementById('pingValue').innerHTML = '--';
-                    document.getElementById('infoPing').innerHTML = '-- мс';
-                    const onlineCube = document.getElementById('onlineCube');
-                    onlineCube.classList.add('offline');
-                    onlineCube.classList.remove('online');
-                }
+                fetchServerStatus();
+                setInterval(fetchServerStatus, 30000);
             }
             
             document.getElementById('copyrightYear').innerHTML = `© ${new Date().getFullYear()} YupiShald`;
