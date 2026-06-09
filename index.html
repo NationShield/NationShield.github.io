@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; image-rendering: crisp-edges; image-rendering: pixelated; }
+        ::selection { background: #8B5CF6; color: #fff; }
         
         html { height: 100%; }
         body { 
@@ -496,7 +497,7 @@
 <body>
     <div id="preloader">
         <div class="preloader-content">
-            <img class="preloader-image" id="preloaderImg" src="img/server2.jpg" alt="YupiShald">
+            <img class="preloader-image" id="preloaderImg" src="source/loading.gif" alt="Loading...">
             <div class="preloader-roman">IV</div>
             <div class="preloader-text">YUPI SHALD</div>
             <div class="preloader-loading-status" id="loadingStatus">Загрузка ресурсов...</div>
@@ -538,10 +539,8 @@
                             <div class="status-badge" id="playersBadge"><div class="online-cube" id="onlineCube"></div><span id="playersCount">Загрузка...</span></div>
                             <div class="status-badge"><i class="fas fa-tachometer-alt"></i><span>Пинг: <span id="pingValue">--</span> мс</span></div>
                         </div>
-                        <button class="join-btn" id="openJoinModalBtn">ПОДАТЬ ЗАЯВКУ</button>
-                        <div style="margin-top: 4px; font-size: 0.65rem; color: #8B5CF6; text-align: center;">НА ВСТУПЛЕНИЕ</div>
+                        </div>
                     </div>
-                </div>
             </section>
 
             <section id="features" class="content-section">
@@ -549,7 +548,7 @@
                 <div class="cards-grid">
                     <div class="card"><div class="card-icon"><i class="fas fa-flag"></i></div><h3 class="card-title">Система Гос-во</h3><p class="card-text">Создавай государства, захватывай территории, строй экономику</p></div>
                     <div class="card"><div class="card-icon"><i class="fas fa-shield-alt"></i></div><h3 class="card-title">Эпические войны</h3><p class="card-text">Стратегические сражения и дипломатия</p></div>
-                    <div class="card"><div class="card-icon"><i class="fas fa-microphone"></i></div><h3 class="card-title">Голосовой чат</h3><p class="card-text">Simple Voice Chat для полного погружения</p></div>
+                    <div class="card"><div class="card-icon"><i class="fas fa-microphone"></i></div><h3 class="card-title">Simple Voice Chat</h3><p class="card-text">Simple Voice Chat для полного погружения</p></div>
                     <div class="card"><div class="card-icon"><i class="fas fa-laugh-beam"></i></div><h3 class="card-title">EmoteCraft</h3><p class="card-text">Поддержка эмоций и анимаций</p></div>
                 </div>
             </section>
@@ -557,7 +556,7 @@
             <section id="info" class="content-section">
                 <h2 class="section-title">Информация</h2>
                 <div class="info-grid">
-                    <div class="info-item"><div class="info-icon"><i class="fas fa-server"></i></div><div class="info-title">Версия</div><div class="info-value">1.21+</div></div>
+                    <div class="info-item"><div class="info-icon"><i class="fas fa-server"></i></div><div class="info-title">Версия</div><div class="info-value">1.21.11</div></div>
                     <div class="info-item"><div class="info-icon"><i class="fas fa-microchip"></i></div><div class="info-title">Моды</div><div class="info-value">Voice Chat + EmoteCraft</div></div>
                     <div class="info-item"><div class="info-icon"><i class="fas fa-wifi"></i></div><div class="info-title">Пинг</div><div class="info-value" id="infoPing">-- мс</div></div>
                     <div class="info-item" id="playersInfoBtn"><div class="info-icon"><i class="fas fa-users"></i></div><div class="info-title">Игроки</div><div class="info-value" id="infoPlayers">--</div></div>
@@ -627,7 +626,7 @@
                         <a href="javascript:void(0)" class="footer-link telegram"></a>
                         <a href="javascript:void(0)" class="footer-link discord"></a>
                     </div>
-                    <div class="website-version">V1.0</div>
+                    <div class="website-version">V5.0</div>
                 </div>
             </div>
         </footer>
@@ -733,19 +732,19 @@
             
             document.getElementById('copyrightYear').innerHTML = `© ${new Date().getFullYear()} YupiShald`;
             
-            const API_URL = () => `https://mcstats.tickhosting.com/api/status?ip=${encodeURIComponent(SERVER_ADDRESS)}&port=25565&type=java`;
+            const API_BASE = () => `http://${SERVER_ADDRESS}:8081`;
             const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1496602268030472205/ASbXtHZpYYXnewToI1uxbPhrmejEvdO6bow7TicNeLFxOEADJNrt1aEyhpnpIHcEu6Rv';
             
             let lastPlayersCount = -1;
             let lastPing = -1;
             let lastPlayerListHash = '';
             
-            function displayData(data) {
-                const online = data.online === true;
-                const playersOnline = online ? (data.players?.online || 0) : 0;
-                const playersMax = data.players?.max || 0;
-                const playerList = data.players?.list || [];
-                const ping = Math.round(data.latency) || 0;
+            function displayData(statusData, playersData) {
+                const online = statusData.online === true;
+                const playersOnline = online ? (statusData.players || 0) : 0;
+                const playersMax = statusData.max || 0;
+                const playerList = playersData || [];
+                const ping = playerList.length > 0 ? Math.round(playerList.reduce((s, p) => s + p.ping, 0) / playerList.length) : 0;
                 
                 const onlineCube = document.getElementById('onlineCube');
                 
@@ -762,10 +761,10 @@
                         container.innerHTML = '<div class="no-players"><i class="fas fa-user-slash"></i> Никого нет онлайн</div>';
                     } else {
                         container.innerHTML = playerList.map(player => {
-                            const encodedName = encodeURIComponent(player);
+                            const encodedName = encodeURIComponent(player.name);
                             return `<div class="player-item">
                                 <img class="player-skin" src="https://minotar.net/avatar/${encodedName}/48" onerror="this.src='https://minotar.net/helm/${encodedName}/48.png'">
-                                <span class="player-name">${player}</span>
+                                <span class="player-name">${player.name}</span>
                             </div>`;
                         }).join('');
                     }
@@ -787,16 +786,20 @@
             async function fetchServerStatus() {
                 if (!SERVER_ADDRESS || addressError) return;
                 try {
-                    const response = await fetch(API_URL());
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const data = await response.json();
-                    displayData(data);
+                    const [statusRes, playersRes] = await Promise.all([
+                        fetch(`${API_BASE()}/api/status`),
+                        fetch(`${API_BASE()}/api/players`)
+                    ]);
+                    if (!statusRes.ok) throw new Error(`HTTP ${statusRes.status}`);
+                    const statusData = await statusRes.json();
+                    const playersData = playersRes.ok ? await playersRes.json() : [];
+                    displayData(statusData, playersData);
                 } catch (error) {
                     console.error('Fetch error:', error);
                     const onlineCube = document.getElementById('onlineCube');
                     onlineCube.classList.add('offline');
                     onlineCube.classList.remove('online');
-                    document.getElementById('playersCount').innerHTML = 'Ошибка соединения';
+                    document.getElementById('playersCount').innerHTML = 'Сервер оффлайн';
                     document.getElementById('infoPlayers').innerHTML = '?';
                     document.getElementById('pingValue').innerHTML = '--';
                     document.getElementById('infoPing').innerHTML = '-- мс';
