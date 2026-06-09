@@ -483,11 +483,7 @@
         .preloader-image {
             width: 180px; height: 180px; image-rendering: pixelated;
             object-fit: cover; margin-bottom: 25px;
-            border: 4px solid #8B5CF6;
-            box-shadow: 0 0 30px rgba(139,92,246,0.4);
-            animation: imagePulse 1.5s ease infinite;
         }
-        @keyframes imagePulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px rgba(139,92,246,0.3); } 50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(139,92,246,0.6); } }
         .preloader-roman { font-size: 3rem; font-weight: bold; color: #8B5CF6; letter-spacing: 5px; margin-top: 20px; animation: glow 1.5s ease infinite; text-shadow: 3px 3px 0 #4C1D95; font-family: 'Minecraft', 'Courier New', monospace; }
         @keyframes glow { 0%,100% { text-shadow: 3px 3px 0 #4C1D95, 0 0 10px rgba(139,92,246,0.3); } 50% { text-shadow: 3px 3px 0 #4C1D95, 0 0 25px rgba(139,92,246,0.7); } }
         .preloader-text { color: #888; margin-top: 15px; font-size: 0.75rem; text-shadow: 1px 1px 0 #000; font-family: 'Minecraft', 'Courier New', monospace; }
@@ -718,7 +714,7 @@
                 img.src = url;
             });
             
-            let SERVER_ADDRESS = 'Yupishald.play-creative.com';
+            let SERVER_ADDRESS = 'yupishald.mcsh.io';
             let addressError = false;
             
             function loadServerAddress() {
