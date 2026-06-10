@@ -542,9 +542,10 @@
             <section id="features" class="content-section">
                 <h2 class="section-title">Особенности</h2>
                 <div class="cards-grid">
-                    <div class="card"><div class="card-icon"><i class="fas fa-flag"></i></div><h3 class="card-title">Система Гос-во</h3><p class="card-text">Создавай государства, захватывай территории, строй экономику</p></div>
-                    <div class="card"><div class="card-icon"><i class="fas fa-shield-alt"></i></div><h3 class="card-title">Эпические войны</h3><p class="card-text">Стратегические сражения и дипломатия</p></div>
-                    <div class="card"><div class="card-icon"><i class="fas fa-microphone"></i></div><h3 class="card-title">Simple Voice Chat</h3><p class="card-text">Simple Voice Chat для полного погружения</p></div>
+                    <div class="card"><div class="card-icon"><i class="fas fa-globe"></i></div><h3 class="card-title">SMP + Государства</h3><p class="card-text">SMP сервер с плагином на создание стран. Создавай свою страну, строй экономику и развивайся</p></div>
+                    <div class="card"><div class="card-icon"><i class="fas fa-shield-alt"></i></div><h3 class="card-title">Защита и Войны</h3><p class="card-text">Твоя территория защищена, но во время войны защита снимается — сражайся за земли</p></div>
+                    <div class="card"><div class="card-icon"><i class="fas fa-telegram"></i></div><h3 class="card-title">Telegram чат</h3><p class="card-text">Общайся с игроками в нашем Telegram чате. Ссылка в футере</p></div>
+                    <div class="card"><div class="card-icon"><i class="fas fa-microphone"></i></div><h3 class="card-title">Голосовой чат</h3><p class="card-text">Simple Voice Chat для полного погружения в игру</p></div>
                 </div>
             </section>
 
@@ -618,7 +619,7 @@
                 <div class="footer-content">
                     <div class="footer-left" id="copyrightYear"></div>
                     <div class="footer-right">
-                        <a href="javascript:void(0)" class="footer-link telegram"></a>
+                        <a href="https://t.me/yupishald" target="_blank" class="footer-link telegram"></a>
                         <a href="javascript:void(0)" class="footer-link discord"></a>
                     </div>
                     <div class="website-version">V5.0</div>
@@ -727,21 +728,25 @@
             
             document.getElementById('copyrightYear').innerHTML = `© ${new Date().getFullYear()} YupiShald`;
             
-            const API_BASE = () => `http://${SERVER_ADDRESS}:8081`;
+            const API_BASE = 'http://162.55.80.246:8081';
             const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1496602268030472205/ASbXtHZpYYXnewToI1uxbPhrmejEvdO6bow7TicNeLFxOEADJNrt1aEyhpnpIHcEu6Rv';
+            let lastPing = 0;
             
-            let lastPlayersCount = -1;
-            let lastPing = -1;
-            let lastPlayerListHash = '';
+            async function fetchJSON(url) {
+                const t1 = performance.now();
+                const res = await fetch(url, { cache: 'no-store' });
+                const data = await res.json();
+                const t2 = performance.now();
+                lastPing = Math.round(data.timestamp ? (t2 - t1) : 0);
+                return data;
+            }
             
-            function displayData(statusData, playersData) {
-                const online = statusData.online === true;
-                const playersOnline = online ? (statusData.players || 0) : 0;
-                const playersMax = statusData.max || 0;
-                const playerList = playersData || [];
-                const ping = playerList.length > 0 ? Math.round(playerList.reduce((s, p) => s + p.ping, 0) / playerList.length) : 0;
-                
-                const onlineCube = document.getElementById('onlineCube');
+            function displayData(pData, sData) {
+                const online = !!(pData && pData.players);
+                const playersOnline = online ? (pData.online || 0) : 0;
+                const playersMax = pData?.max || 0;
+                const playerList = online ? (pData.players || []) : [];
+                const ping = sData?.mspt ? Math.round(sData.mspt) : 0;
                 
                 if (online) {
                     onlineCube.classList.add('online');
@@ -758,7 +763,7 @@
                         container.innerHTML = playerList.map(player => {
                             const encodedName = encodeURIComponent(player.name);
                             return `<div class="player-item">
-                                <img class="player-skin" src="https://minotar.net/avatar/${encodedName}/48" onerror="this.src='https://minotar.net/helm/${encodedName}/48.png'">
+                                <img class="player-skin" src="https://minotar.net/helm/${encodedName}/48" onerror="this.src='https://minotar.net/avatar/${encodedName}/48.png'">
                                 <span class="player-name">${player.name}</span>
                             </div>`;
                         }).join('');
@@ -772,30 +777,22 @@
                     document.getElementById('infoPing').innerHTML = '-- мс';
                     document.getElementById('playersList').innerHTML = '<div class="no-players"><i class="fas fa-plug"></i> Сервер не доступен</div>';
                 }
-                
-                lastPlayersCount = online ? playersOnline : -1;
-                lastPing = ping;
-                lastPlayerListHash = JSON.stringify(playerList);
             }
             
             async function fetchServerStatus() {
-                if (!SERVER_ADDRESS || addressError) return;
                 try {
-                    const [statusRes, playersRes] = await Promise.all([
-                        fetch(`${API_BASE()}/api/status`),
-                        fetch(`${API_BASE()}/api/players`)
+                    const [pData, sData] = await Promise.all([
+                        fetchJSON(API_BASE + '/api/players'),
+                        fetchJSON(API_BASE + '/api/server')
                     ]);
-                    if (!statusRes.ok) throw new Error(`HTTP ${statusRes.status}`);
-                    const statusData = await statusRes.json();
-                    const playersData = playersRes.ok ? await playersRes.json() : [];
-                    displayData(statusData, playersData);
+                    displayData(pData, sData);
                 } catch (error) {
                     console.error('Fetch error:', error);
                     const onlineCube = document.getElementById('onlineCube');
                     onlineCube.classList.add('offline');
                     onlineCube.classList.remove('online');
                     document.getElementById('playersCount').innerHTML = 'Сервер оффлайн';
-                    document.getElementById('infoPlayers').innerHTML = '?';
+                    document.getElementById('infoPlayers').innerHTML = '0';
                     document.getElementById('pingValue').innerHTML = '--';
                     document.getElementById('infoPing').innerHTML = '-- мс';
                 }
