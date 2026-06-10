@@ -728,25 +728,16 @@
             
             document.getElementById('copyrightYear').innerHTML = `© ${new Date().getFullYear()} YupiShald`;
             
-            const API_BASE = 'https://162.55.80.246:8083';
+            const MC_API = 'https://api.mcsrvstat.us/3/162.55.80.246:13067';
             const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1496602268030472205/ASbXtHZpYYXnewToI1uxbPhrmejEvdO6bow7TicNeLFxOEADJNrt1aEyhpnpIHcEu6Rv';
-            let lastPing = 0;
             
-            async function fetchJSON(url) {
-                const t1 = performance.now();
-                const res = await fetch(url, { cache: 'no-store' });
-                const data = await res.json();
-                const t2 = performance.now();
-                lastPing = Math.round(data.timestamp ? (t2 - t1) : 0);
-                return data;
-            }
-            
-            function displayData(pData, sData) {
-                const online = !!(pData && pData.players);
-                const playersOnline = online ? (pData.online || 0) : 0;
-                const playersMax = pData?.max || 0;
-                const playerList = online ? (pData.players || []) : [];
-                const ping = sData?.mspt ? Math.round(sData.mspt) : 0;
+            function displayData(data) {
+                const online = data.online === true;
+                const playersOnline = online ? (data.players?.online || 0) : 0;
+                const playersMax = data.players?.max || 0;
+                const playerList = online ? (data.players?.list || []) : [];
+                const ping = data.ping || 0;
+                const onlineCube = document.getElementById('onlineCube');
                 
                 if (online) {
                     onlineCube.classList.add('online');
@@ -781,11 +772,10 @@
             
             async function fetchServerStatus() {
                 try {
-                    const [pData, sData] = await Promise.all([
-                        fetchJSON(API_BASE + '/api/players'),
-                        fetchJSON(API_BASE + '/api/server')
-                    ]);
-                    displayData(pData, sData);
+                    const res = await fetch(MC_API, { cache: 'no-store' });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    displayData(data);
                 } catch (error) {
                     console.error('Fetch error:', error);
                     const onlineCube = document.getElementById('onlineCube');
