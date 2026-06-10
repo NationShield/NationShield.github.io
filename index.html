@@ -545,7 +545,6 @@
                     <div class="card"><div class="card-icon"><i class="fas fa-flag"></i></div><h3 class="card-title">Система Гос-во</h3><p class="card-text">Создавай государства, захватывай территории, строй экономику</p></div>
                     <div class="card"><div class="card-icon"><i class="fas fa-shield-alt"></i></div><h3 class="card-title">Эпические войны</h3><p class="card-text">Стратегические сражения и дипломатия</p></div>
                     <div class="card"><div class="card-icon"><i class="fas fa-microphone"></i></div><h3 class="card-title">Simple Voice Chat</h3><p class="card-text">Simple Voice Chat для полного погружения</p></div>
-                    <div class="card"><div class="card-icon"><i class="fas fa-laugh-beam"></i></div><h3 class="card-title">EmoteCraft</h3><p class="card-text">Поддержка эмоций и анимаций</p></div>
                 </div>
             </section>
 
@@ -553,7 +552,7 @@
                 <h2 class="section-title">Информация</h2>
                 <div class="info-grid">
                     <div class="info-item"><div class="info-icon"><i class="fas fa-server"></i></div><div class="info-title">Версия</div><div class="info-value">1.21.11</div></div>
-                    <div class="info-item"><div class="info-icon"><i class="fas fa-microchip"></i></div><div class="info-title">Моды</div><div class="info-value">Voice Chat + EmoteCraft</div></div>
+                    <div class="info-item"><div class="info-icon"><i class="fas fa-microchip"></i></div><div class="info-title">Моды</div><div class="info-value">Voice Chat</div></div>
                     <div class="info-item"><div class="info-icon"><i class="fas fa-wifi"></i></div><div class="info-title">Пинг</div><div class="info-value" id="infoPing">-- мс</div></div>
                     <div class="info-item" id="playersInfoBtn"><div class="info-icon"><i class="fas fa-users"></i></div><div class="info-title">Игроки</div><div class="info-value" id="infoPlayers">--</div></div>
                 </div>
@@ -714,7 +713,7 @@
                 img.src = url;
             });
             
-            let SERVER_ADDRESS = 'yupishald.mcsh.io';
+            let SERVER_ADDRESS = 'Yupishald.nether-zone.com';
             let addressError = false;
             
             function loadServerAddress() {
@@ -869,6 +868,7 @@
             const joinStatus = document.getElementById('joinFormStatus');
             const submitJoinBtn = document.getElementById('submitJoinBtn');
             
+            if (openJoinBtn && joinModal) {
             openJoinBtn.addEventListener('click', () => { joinModal.classList.add('active'); });
             
             closeJoinBtn.addEventListener('click', () => {
@@ -949,6 +949,7 @@
                     submitJoinBtn.disabled = false;
                 }
             });
+            }
             
             loadServerAddress();
             
